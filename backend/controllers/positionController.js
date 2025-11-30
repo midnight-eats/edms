@@ -1,14 +1,6 @@
-const Connection = require("./connection.js");
-const { Position } = require("./models/position.js")
+const { Position } = require("../models/position.js")
 
-const express = require("express");
-const app = express();
-
-app.use(express.json());
-
-const positionRouter = express.Router();
-
-positionRouter.get("/", function(request, response) {
+async function positionGet(request, response) {
   Position.findAll({ 
     raw : true,
     where: {
@@ -19,9 +11,9 @@ positionRouter.get("/", function(request, response) {
     response.json(res);
   })
   .catch(err => console.log(err));
-});
+}
 
-positionRouter.post("/delete/:id", function(request, response) {
+async function positionPostDelete(request, response) {
   var id = request.params["id"];
 
   Position.update({ 
@@ -35,9 +27,9 @@ positionRouter.post("/delete/:id", function(request, response) {
       response.json(res);
     })
     .catch(err => console.log(err));
-});
+}
 
-positionRouter.post("/create", function(request, response) {
+async function positionPostCreate(request, response) {
   var position = request.body;
   console.log(`Create ${position}`)
   Position.create({
@@ -47,9 +39,9 @@ positionRouter.post("/create", function(request, response) {
       response.json(res);
     })
     .catch(err => console.log(err));
-});
+}
 
-positionRouter.post("/update", function(request, response) {
+async function positionPostUpdate(request, response) {
   var position = request.body;
   console.log(`Update ${position}`)
   Position.update({ 
@@ -62,19 +54,11 @@ positionRouter.post("/update", function(request, response) {
     .then((res) =>  {
       response.json(res);
     });
-});
+}
 
-app.use("/api/positions/", positionRouter);
-app.delete("/api/positions/", positionRouter);
-   
-app.use("/about", function (request, response) {
-    response.send("О сайте");
-});
-   
-app.use("/", function (request, response) {
-    response.send("Главная страница");
-});
-
-module.exports = {
-  positionRouter
+module.exports = { 
+  positionGet, 
+  positionPostCreate, 
+  positionPostDelete, 
+  positionPostUpdate 
 }

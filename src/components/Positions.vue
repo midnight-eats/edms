@@ -9,7 +9,11 @@
   <template v-slot:top>
     <v-toolbar flat>
       <v-toolbar-title>
-        <v-icon color="medium-emphasis" icon="mdi-book-multiple" size="x-small" start></v-icon>
+        <v-icon 
+          color="medium-emphasis" 
+          icon="mdi-book-multiple" 
+          size="x-small" start>
+        </v-icon>
         Должности
       </v-toolbar-title>
 
@@ -25,19 +29,35 @@
 
     <template v-slot:item.actions="{ item }">
       <div class="d-flex ga-2 justify-end">
-        <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="editItem(item.id)"></v-icon>
-        <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="removeItem(item.id)"></v-icon>
+        <v-icon 
+          color="medium-emphasis" 
+          icon="mdi-pencil" 
+          size="small" 
+          @click="editItem(item.id)">
+        </v-icon>
+        <v-icon 
+          color="medium-emphasis" 
+          icon="mdi-delete" 
+          size="small" 
+          @click="removeItem(item.id)">
+        </v-icon>
       </div>
     </template>  
   </v-data-table-virtual>
   </v-sheet>
 
   <v-dialog v-model="dialog" max-width="500">
-    <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} категории`">
+    <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} должности`">
       <template v-slot:text>
         <v-row>
+          <v-col v-if="errorMessage" cols="12">
+            <v-label :text="errorMessage"></v-label>
+          </v-col>
           <v-col cols="12">
-            <v-text-field v-model="formModel.name" label="Название"></v-text-field>
+            <v-text-field 
+              v-model="formModel.name"
+              label="Название">
+            </v-text-field>
           </v-col>
         </v-row>
       </template>
@@ -45,9 +65,16 @@
       <v-divider></v-divider>
 
       <v-card-actions class="bg-surface-light">
-        <v-btn text="Отменить" variant="plain" @click="dialog = false"></v-btn>
+        <v-btn 
+          text="Отменить" 
+          variant="plain"
+          @click="cancel">
+        </v-btn>
         <v-spacer></v-spacer>
-        <v-btn text="Сохранить" @click="save"></v-btn>
+        <v-btn 
+          text="Сохранить" 
+          @click="save">
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -67,6 +94,7 @@
   const dialog = shallowRef(false);  
   const formModel = ref(createNewRecord());
   const isEditing = toRef(() => !!formModel.value.id);
+  const errorMessage = shallowRef("");
 
   function loadData() {
     Promise.all([
@@ -108,8 +136,12 @@
     dialog.value = true;
   }
 
-  function save()
-  {
+  function save() {
+    if (formModel.value.name.length == 0) {
+      errorMessage.value = "Все поля должны быть заполнены";
+      return;
+    }
+
     if (isEditing.value) {
       Promise.all([axios.post("/api/positions/update", formModel.value)])
       .then((responses) => {           
@@ -124,9 +156,14 @@
         console.log(serverPosition);     
         items.value.push(serverPosition);
       });
-
     }
 
+    errorMessage.value = "";
+    dialog.value = false;
+  }
+
+  function cancel() {
+    errorMessage.value = "";
     dialog.value = false;
   }
 

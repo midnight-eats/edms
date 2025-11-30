@@ -3,7 +3,7 @@ const app = express();
 
 app.use(express.json());
 
-const { positionRouter } = require("./positionRouter.js");
+const { positionRouter } = require("./routers/positionRouter.js");
 const { categoryRouter } = require("./categoryRouter.js");
 
 app.use("/api/positions/", positionRouter);
