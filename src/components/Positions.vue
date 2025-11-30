@@ -95,6 +95,7 @@
   const formModel = ref(createNewRecord());
   const isEditing = toRef(() => !!formModel.value.id);
   const errorMessage = shallowRef("");
+  const tempModel = createNewRecord();
 
   function loadData() {
     Promise.all([
@@ -126,11 +127,11 @@
   }
 
   function editItem(id) {
-    const found = items.value.find(item => item.id === id);
+    tempModel.value = items.value.find(item => item.id === id);
 
     formModel.value = {
-      id: found.id,
-      name: found.name,
+      id: tempModel.value.id,
+      name: tempModel.value.name,
     };
 
     dialog.value = true;
@@ -142,7 +143,14 @@
       return;
     }
 
+    var found = items.value.find(item => item.name === formModel.value.name);
+
     if (isEditing.value) {
+      if (found && tempModel.value.name !== formModel.value.name) {
+        errorMessage.value = "Такая запись уже существует в базе данных";
+        return;
+      }
+
       Promise.all([axios.post("/api/positions/update", formModel.value)])
       .then((responses) => {           
         const index = items.value.findIndex(item => item.id === formModel.value.id);
@@ -150,6 +158,11 @@
       });
     } 
     else {
+      if (found) {
+        errorMessage.value = "Такая запись уже существует в базе данных"; 
+        return;
+      }
+
       Promise.all([axios.post("/api/positions/create", formModel.value)])
       .then((responses) => { 
         var serverPosition = responses[0].data;

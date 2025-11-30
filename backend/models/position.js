@@ -12,7 +12,6 @@ const Position = connection.define("positions", {
   name: {
     type: Sequelize.STRING(100),
     allowNull: false,
-    unique: true,
     validate: {
       notEmpty: {
         msg: 'Position name cannot be empty'
