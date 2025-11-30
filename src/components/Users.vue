@@ -1,53 +1,56 @@
 <template>
-    <v-sheet border rounded>  
+  <v-sheet border rounded>  
     <v-data-table-virtual
         :headers="headers"
         :items="items"
         :hide-default-footer="items.length < 20"
     >
+    <template v-slot:item.positionId="{ item }">
+      {{ getPositionName(item.positionId) }}
+    </template>
 
     <template v-slot:top>
-        <v-toolbar flat>
-          <v-toolbar-title>
-            <v-icon 
-              color="medium-emphasis" 
-              icon="mdi-book-multiple" 
-              size="x-small" start>
-            </v-icon>
-            Пользователи
-          </v-toolbar-title>
+      <v-toolbar flat>
+        <v-toolbar-title>
+          <v-icon 
+            color="medium-emphasis" 
+            icon="mdi-book-multiple" 
+            size="x-small" start>
+          </v-icon>
+          Пользователи
+        </v-toolbar-title>
 
-          <v-btn
-            class="me-2"
-            prepend-icon="mdi-plus"
-            rounded="lg"
-            text="Добавить"
-            @click="addItem"
-          ></v-btn>
-        </v-toolbar>
+        <v-btn
+          class="me-2"
+          prepend-icon="mdi-plus"
+          rounded="lg"
+          text="Добавить"
+          @click="addItem"
+        ></v-btn>
+      </v-toolbar>
     </template>
 
     <template v-slot:item.actions="{ item }">
-        <div class="d-flex ga-2 justify-end">
-          <v-icon 
-            color="medium-emphasis" 
-            icon="mdi-pencil" 
-            size="small" 
-            @click="editItem(item.id)">
-          </v-icon>
-          <v-icon 
-            color="medium-emphasis" 
-            icon="mdi-delete" 
-            size="small" 
-            @click="removeItem(item.id)">
-          </v-icon>
-        </div>
+      <div class="d-flex ga-2 justify-end">
+        <v-icon 
+          color="medium-emphasis" 
+          icon="mdi-pencil" 
+          size="small" 
+          @click="editItem(item.id)">
+        </v-icon>
+        <v-icon 
+          color="medium-emphasis" 
+          icon="mdi-delete" 
+          size="small" 
+          @click="removeItem(item.id)">
+        </v-icon>
+      </div>
     </template>  
   </v-data-table-virtual>
   </v-sheet>
 
 
-<v-dialog v-model="dialog" max-width="500">
+  <v-dialog v-model="dialog" max-width="500">
     <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} пользователя`">
       <template v-slot:text>
         <v-row>
@@ -77,11 +80,11 @@
 
           <v-col cols="12">
             <v-select
-                label="Должность"
-                :items="positions"
-                item-title="name"
-                item-value="id"
-                v-model="formModel.position"
+              label="Должность"
+              :items="positions"
+              item-title="name"
+              item-value="id"
+              v-model="formModel.positionId"
             ></v-select>
           </v-col>
         </v-row>
@@ -90,7 +93,7 @@
       <v-divider></v-divider>
 
       <v-card-actions class="bg-surface-light">
-        <v-btn text="Отменить" variant="plain" @click="dialog = false"></v-btn>
+        <v-btn text="Отменить" variant="plain" @click="cancel"></v-btn>
 
         <v-spacer></v-spacer>
 
@@ -110,7 +113,7 @@
     { title: 'ФИО', align: 'start', key: 'name' },
     { title: 'Логин', align: 'start', key: 'username' },
     { title: 'Эл. почта', align: 'start', key: 'email' },
-    { title: 'Должность', align: 'start', key: 'position' },
+    { title: 'Должность', align: 'start', key: 'positionId' },
     { title: 'Роль', align: 'start', key: 'role' },
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
@@ -129,9 +132,16 @@
       axios.get('/api/positions/')
     ])
     .then((responses) => {
+      console.log('yay');
       items.value = responses[0].data;
       positions.value = responses[1].data;
     });
+  }
+
+  function getPositionName(positionId) {
+    const position = positions.value.find(pos => pos.id === positionId);
+    console.log(positionId);
+    return position ? position.name : 'Unknown';
   }
 
   function createNewRecord () {
@@ -182,10 +192,11 @@
         formModel.value.username.length == 0 ||
         formModel.value.password.length == 0 ||
         formModel.value.email.length == 0 ||
-        formModel.value.position.length == 0) {
+        !formModel.value.positionId) {
       errorMessage.value = "Все поля должны быть заполнены";
       return;
     }
+
 
     var found = items.value.find(item => (item.username === formModel.value.username ||
                                           item.email === formModel.value.email));
@@ -223,6 +234,7 @@
   }
 
   function cancel() {
+    console.log(formModel.value.positionId);
     errorMessage.value = "";
     dialog.value = false;
   }
