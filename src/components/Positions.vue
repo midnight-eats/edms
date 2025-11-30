@@ -186,5 +186,3 @@
 <script mounted>
     console.log("mounted");
 </script>
-
-

@@ -9,7 +9,11 @@
     <template v-slot:top>
         <v-toolbar flat>
           <v-toolbar-title>
-            <v-icon color="medium-emphasis" icon="mdi-book-multiple" size="x-small" start></v-icon>
+            <v-icon 
+              color="medium-emphasis" 
+              icon="mdi-book-multiple" 
+              size="x-small" start>
+            </v-icon>
             Пользователи
           </v-toolbar-title>
 
@@ -23,11 +27,20 @@
         </v-toolbar>
     </template>
 
-
     <template v-slot:item.actions="{ item }">
         <div class="d-flex ga-2 justify-end">
-          <v-icon color="medium-emphasis" icon="mdi-pencil" size="small" @click="editItem(item.id)"></v-icon>
-          <v-icon color="medium-emphasis" icon="mdi-delete" size="small" @click="removeItem(item.id)"></v-icon>
+          <v-icon 
+            color="medium-emphasis" 
+            icon="mdi-pencil" 
+            size="small" 
+            @click="editItem(item.id)">
+          </v-icon>
+          <v-icon 
+            color="medium-emphasis" 
+            icon="mdi-delete" 
+            size="small" 
+            @click="removeItem(item.id)">
+          </v-icon>
         </div>
     </template>  
   </v-data-table-virtual>
@@ -38,35 +51,38 @@
     <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} пользователя`">
       <template v-slot:text>
         <v-row>
-
+          <v-col v-if="errorMessage" cols="12">
+            <v-label :text="errorMessage"></v-label>
+          </v-col>
           <v-col cols="12">
             <v-text-field v-model="formModel.name" label="ФИО"></v-text-field>
           </v-col>
-
-          <v-col cols="12" md="6">
-            <v-text-field v-model="formModel.login" label="Логин"></v-text-field>
+          <v-col cols="12">
+            <v-text-field v-model="formModel.username" label="Логин"></v-text-field>
           </v-col>
-
-          
-          <v-col cols="12" md="6">
+          <v-col v-if="!isEditing" cols="12">
             <v-text-field v-model="formModel.password" label="Пароль"></v-text-field>
+          </v-col>
+          <v-col cols="12">
+            <v-text-field v-model="formModel.email" label="Эл. почта"></v-text-field>
           </v-col>
 
           <v-col cols="12">
-            <v-text-field v-model="formModel.post" label="Должность"></v-text-field>
+            <v-select
+              label="Роль"
+              :items="ROLES"
+              v-model="formModel.role"
+            ></v-select>
           </v-col>
 
-
-          <!--v-col cols="12" md="6">
-            <v-select v-model="formModel.genre" :items="['Fiction', 'Dystopian', 'Non-Fiction', 'Sci-Fi']" label="Genre"></v-select>
-          </v-col-->
-
-          <!--v-col cols="12" md="6">
-            <v-number-input v-model="formModel.year" :max="currentYear" :min="1" label="Year"></v-number-input>
-          </v-col-->
-
-          <v-col cols="12" md="6">
-            <v-number-input v-model="formModel.age" :min="1" label="Возраст"></v-number-input>
+          <v-col cols="12">
+            <v-select
+                label="Должность"
+                :items="positions"
+                item-title="name"
+                item-value="id"
+                v-model="formModel.position"
+            ></v-select>
           </v-col>
         </v-row>
       </template>
@@ -82,160 +98,135 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-
-
 </template>
 
 <script setup>
   import { computed, ref, shallowRef, toRef } from 'vue';
   import axios from 'axios';  
-
+  const ROLES = ["сотрудник", "оператор", "контроллер", "администратор"];
 
   const headers = [
+    { title: 'ID', align: 'start', key: 'id' },
     { title: 'ФИО', align: 'start', key: 'name' },
-    { title: 'Логин', align: 'start', key: 'login' },
-    { title: 'Пароль', align: 'start', key: 'password' },
-    { title: 'Должность', align: 'start', key: 'post'},
-    { title: 'Возраст', align: 'end', key: 'age' },
-    { title: 'Действия', key: 'actions', align: 'end', sortable: false },
+    { title: 'Логин', align: 'start', key: 'username' },
+    { title: 'Эл. почта', align: 'start', key: 'email' },
+    { title: 'Должность', align: 'start', key: 'position' },
+    { title: 'Роль', align: 'start', key: 'role' },
+    { title: '', key: 'actions', align: 'end', sortable: false },
+  ];
 
-  ]
+  const items = ref([]);
+  const positions = ref([]);
+  const dialog = shallowRef(false);  
+  const formModel = ref(createNewRecord());
+  const isEditing = toRef(() => !!formModel.value.id);
+  const errorMessage = shallowRef("");
+  const tempModel = createNewRecord();
 
-
-  const items = ref([])
-  const dialog = shallowRef(false)  
-  const formModel = ref(createNewRecord())  
-  const isEditing = toRef(() => !!formModel.value.id)  
-
-  function loadData()
-  {
-        console.log("loadData");
-        //this.loading = true
-
-        Promise.all([
-            axios.get('/api/users/')
-        ])
-        .then((responses) =>
-        {
-            console.log(responses);            
-            console.log(responses[0].data);
-            //users = responses[0].data;
-
-            /*
-            responses[0].data.forEach(u => 
-            {
-                users.push(u);
-                
-            });
-            */
-
-            items.value = responses[0].data;
-
-
-            /*
-            this.items = []
-            responses[0].data.data.forEach(d =>
-              {
-                o = new Notch()
-                Object.assign(o, d)
-                this.items.push(o)
-              })
-
-
-            this.units = responses[1].data.data
-            this.loading = false
-            */
-        })
-
+  function loadData() {
+    Promise.all([
+      axios.get('/api/users/'),
+      axios.get('/api/positions/')
+    ])
+    .then((responses) => {
+      items.value = responses[0].data;
+      positions.value = responses[1].data;
+    });
   }
 
-    function addItem()
-    {
-      formModel.value = createNewRecord()
-      dialog.value = true      
+  function createNewRecord () {
+    return {
+      id: 0,
+      name: '',
+      username: '',
+      password: '',
+      email: '',
+      role: '',
+      positionId: null
+    };
+  }
+
+  function addItem() {
+    formModel.value = createNewRecord();
+    errorMessage.value = "";
+    dialog.value = true;
+  }
+
+  function removeItem(id) {
+    Promise.all([axios.post(`/api/users/delete/${id}`)])
+    .then((responses) => {
+      const index = items.value.findIndex(item => item.id === id);
+      items.value.splice(index, 1);
+    });
+  }
+
+  function editItem(id) {
+    tempModel.value = items.value.find(item => item.id === id);
+
+    formModel.value = {
+      id: tempModel.value.id,
+      name: tempModel.value.name,
+      username: tempModel.value.username,
+      password: tempModel.value.password,
+      email: tempModel.value.email,
+      role: tempModel.value.role,
+      position: tempModel.value.position
+    };
+
+    errorMessage.value = "";
+    dialog.value = true;
+  }
+
+  function save() {
+    if (formModel.value.name.length == 0 ||
+        formModel.value.username.length == 0 ||
+        formModel.value.password.length == 0 ||
+        formModel.value.email.length == 0 ||
+        formModel.value.position.length == 0) {
+      errorMessage.value = "Все поля должны быть заполнены";
+      return;
     }
 
-    function removeItem(id)
-    {
-      Promise.all([axios.post(`/api/users/delete/${id}`)])
-        .then((responses) =>
-        {
-            console.log(responses);            
-            console.log(responses[0].data);
+    var found = items.value.find(item => (item.username === formModel.value.username ||
+                                          item.email === formModel.value.email));
 
-            const index = items.value.findIndex(item => item.id === id)
-            items.value.splice(index, 1)
-            console.log("removeItem", id)
-        })
-
-    }
-
-    
-    function createNewRecord () 
-    {
-        return {
-            name: '',
-            login: '',
-            password: '',
-            post: '',
-            age: 21,
-        }
-    }
-
-
-    function editItem(id)
-    {
-        const found = items.value.find(item => item.id === id)
-
-        formModel.value = 
-        {
-            id: found.id,
-            name: found.name,
-            login: found.login,
-            password: found.password,
-            post: found.post,
-            age: found.age,//found.pages,
-         }
-
-
-        dialog.value = true
-        console.log("editItem", id)
-    }
-
-    function save()
-    {
-
-
-
-
-
-      if (isEditing.value) 
-      {
-
-        Promise.all([axios.post("/api/users/update", formModel.value)])
-        .then((responses) =>
-        {           
-            const index = items.value.findIndex(item => item.id === formModel.value.id)
-            items.value[index] = formModel.value
-        })
-      } 
-      else 
-      {
-        Promise.all([axios.post("/api/users/create", formModel.value)])
-        .then((responses) =>
-        { 
-            var serverUser = responses[0].data
-            console.log(serverUser)     
-            items.value.push(serverUser)
-        })
-
+    if (isEditing.value) {
+      if (found && 
+          (tempModel.value.username !== formModel.value.username ||
+          tempModel.value.email !== formModel.value.email)) {
+        errorMessage.value = "Такая запись уже существует в базе данных";
+        return;
       }
-  
-      dialog.value = false
+
+      Promise.all([axios.post("/api/users/update", formModel.value)])
+      .then((responses) => {           
+        const index = items.value.findIndex(item => item.id === formModel.value.id);
+        items.value[index] = formModel.value;
+      });
+    } 
+    else {
+      if (found) {
+        errorMessage.value = "Такая запись уже существует в базе данных"; 
+        return;
+      }
+
+      Promise.all([axios.post("/api/users/create", formModel.value)])
+      .then((responses) => { 
+        var serverUser = responses[0].data;
+        console.log(serverUser);     
+        items.value.push(serverUser);
+      });
     }
 
+    errorMessage.value = "";
+    dialog.value = false;
+  }
 
-    console.log("setup end");
+  function cancel() {
+    errorMessage.value = "";
+    dialog.value = false;
+  }
+
   loadData();
 </script>
 

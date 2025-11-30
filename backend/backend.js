@@ -5,9 +5,11 @@ app.use(express.json());
 
 const { positionRouter } = require("./routers/positionRouter.js");
 const { categoryRouter } = require("./categoryRouter.js");
+const { userRouter } = require("./routers/userRouter.js");
 
 app.use("/api/positions/", positionRouter);
 app.use("/api/categories/", categoryRouter);
+app.use("/api/users/", userRouter);
    
 app.use("/about", function (request, response) {
     response.send("О сайте");

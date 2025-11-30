@@ -1,14 +1,5 @@
-const ERROR_TYPES = {
-  VALUE_EXISTS: 'value_exists', 
-  INVALID_FORMAT: 'invalid_format'
-};
-
-const ERROR_MESSAGES = {
-  [ERROR_TYPES.VALUE_EXISTS]: "Данная запись уже существует в базе данных",
-  [ERROR_TYPES.INVALID_FORMAT]: "Некорретный ввод"
-};
+const ROLES = ["сотрудник", "оператор", "контроллер", "администратор"];
 
 module.exports = {
-  ERROR_TYPES,
-  ERROR_MESSAGES
+  ROLES
 };

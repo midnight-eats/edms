@@ -3,6 +3,7 @@ const { positionGet,
   positionPostCreate, 
   positionPostDelete, 
   positionPostUpdate } = require('../controllers/positionController');
+const { User } = require("../models/user.js")
 
 const positionRouter = express.Router();
 
