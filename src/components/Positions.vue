@@ -50,14 +50,19 @@
     <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} должности`">
       <template v-slot:text>
         <v-row>
-          <v-col v-if="errorMessage" cols="12">
-            <v-label :text="errorMessage"></v-label>
+          <v-col v-if="errorMessage.model" cols="12">
+            <v-label :text="errorMessage.model"></v-label>
           </v-col>
           <v-col cols="12">
             <v-text-field 
               v-model="formModel.name"
-              label="Название">
-            </v-text-field>
+              label="Название"
+              required
+            ></v-text-field>
+            <v-label 
+            v-if="errorMessage.name" 
+            :text="errorMessage.name"
+            ></v-label>
           </v-col>
         </v-row>
       </template>
@@ -82,7 +87,9 @@
 
 <script setup>
   import { computed, ref, shallowRef, toRef } from 'vue';
-  import axios from 'axios';  
+  import axios from 'axios';
+  import useVuelidate from '@vuelidate/core';
+  import { required } from '@vuelidate/validators';  
 
   const headers = [
     { title: 'ID', align: 'start', key: 'id' },
@@ -94,8 +101,14 @@
   const dialog = shallowRef(false);  
   const formModel = ref(createNewRecord());
   const isEditing = toRef(() => !!formModel.value.id);
-  const errorMessage = shallowRef("");
+  const errorMessage = ref({ model: '', name: '' });
   const tempModel = createNewRecord();
+
+  const rules = {
+    name: { required }
+  };
+
+  const v$ = useVuelidate(rules, formModel);
 
   function loadData() {
     Promise.all([
@@ -137,9 +150,15 @@
     dialog.value = true;
   }
 
-  function save() {
-    if (formModel.value.name.length == 0) {
-      errorMessage.value = "Все поля должны быть заполнены";
+  async function save() {
+    const result = await v$.value.$validate();
+    
+    if (!result) {
+      errorMessage.value.model = "";
+
+      if (v$.value.name.required.$invalid)
+        errorMessage.value.name = "Поле должно быть заполнено";
+
       return;
     }
 
@@ -147,7 +166,8 @@
 
     if (isEditing.value) {
       if (found && tempModel.value.name !== formModel.value.name) {
-        errorMessage.value = "Такая запись уже существует в базе данных";
+        errorMessage.value.name = "";
+        errorMessage.value.model = "Такая запись уже существует в базе данных";
         return;
       }
 
@@ -159,7 +179,8 @@
     } 
     else {
       if (found) {
-        errorMessage.value = "Такая запись уже существует в базе данных"; 
+        errorMessage.value.name = "";
+        errorMessage.value.model = "Такая запись уже существует в базе данных"; 
         return;
       }
 
@@ -171,12 +192,13 @@
       });
     }
 
-    errorMessage.value = "";
+    // errorMessage.value = "";
     dialog.value = false;
   }
 
   function cancel() {
-    errorMessage.value = "";
+    errorMessage.value.name = "";
+    errorMessage.value.model = "";
     dialog.value = false;
   }
 

@@ -106,6 +106,9 @@
 <script setup>
   import { computed, ref, shallowRef, toRef } from 'vue';
   import axios from 'axios';  
+  import useVuelidate from '@vuelidate/core';
+  import { required } from '@vuelidate/validators';
+
   const ROLES = ["сотрудник", "оператор", "контроллер", "администратор"];
 
   const headers = [
@@ -180,7 +183,7 @@
       password: tempModel.value.password,
       email: tempModel.value.email,
       role: tempModel.value.role,
-      position: tempModel.value.position
+      positionId: tempModel.value.positionId
     };
 
     errorMessage.value = "";
@@ -203,9 +206,9 @@
 
     if (isEditing.value) {
       if (found && 
-          (tempModel.value.username !== formModel.value.username ||
+          (tempModel.value.username !== formModel.value.username &&
           tempModel.value.email !== formModel.value.email)) {
-        errorMessage.value = "Такая запись уже существует в базе данных";
+        errorMessage.value = "Запись с таким логином/эл. почтой уже существует в базе данных";
         return;
       }
 
@@ -217,7 +220,7 @@
     } 
     else {
       if (found) {
-        errorMessage.value = "Такая запись уже существует в базе данных"; 
+        errorMessage.value = "Запись с таким логином/эл. почтой уже существует в базе данных"; 
         return;
       }
 

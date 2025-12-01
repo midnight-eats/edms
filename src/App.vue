@@ -2,11 +2,8 @@
   <v-app>
     <v-navigation-drawer app v-model="drawer">
       <v-list nav dense>
-        <!-- Link to HomeView -->
         <v-list-item prepend-icon="mdi-home" title="Home" to="/"></v-list-item>
-        <!-- Link to DashboardView -->
-        <v-list-item prepend-icon="mdi-view-dashboard" title="Users" to="/users"></v-list-item>
-        <!-- Link to ProfileView -->
+        <v-list-item prepend-icon="mdi-view-dashboard" title="Пользователи" to="/users"></v-list-item>
         <v-list-item prepend-icon="mdi-account" title="Должности" to="/positions"></v-list-item>
         <v-list-item prepend-icon="mdi-account" title="Категории" to="/categories"></v-list-item>
       </v-list>
