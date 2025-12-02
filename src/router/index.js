@@ -8,6 +8,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 //import { routes } from 'vue-router/auto-routes'
 import Users from '@/components/Users.vue'
+import Departments from '@/components/Departments.vue'
 import Positions from '@/components/Positions.vue'
 import Categories from '@/components/Categories.vue'
 import index from '@/pages/index.vue';
@@ -16,6 +17,7 @@ import HelloWorld from '@/components/HelloWorld.vue';
 const routes = [
   { path: '/', component: HelloWorld},
   { path: '/users', component: Users },
+  { path: '/departments', component: Departments },
   { path: '/positions', component: Positions },
   { path: '/categories', component: Categories },
   //{ path: '/profile', component: ProfileView },

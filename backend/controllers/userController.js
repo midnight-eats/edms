@@ -1,5 +1,4 @@
 const { User } = require("../models/user.js");
-const { Position } = require("../models/position.js");
 
 async function userGet(request, response) {
   User.findAll({ 

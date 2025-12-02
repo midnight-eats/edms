@@ -2,6 +2,7 @@ const Connection = require("../connection.js")
 const { Sequelize } = require('sequelize');
 const connection = Connection.getConnection();
 const { Position } = require("./position.js");
+const { Department } = require("./department.js");
 const { ROLES } = require("../constants.js");;
 
 const User = connection.define("users", {
@@ -69,8 +70,9 @@ const User = connection.define("users", {
 });
 
 User.belongsTo(Position);
+User.belongsTo(Department);
 
-connection.sync().then(result => {
+connection.sync({force: false, alter: true}).then(result => {
   console.log(result);
 })
 .catch(err => console.log(err));

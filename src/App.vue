@@ -4,6 +4,7 @@
       <v-list nav dense>
         <v-list-item prepend-icon="mdi-home" title="Home" to="/"></v-list-item>
         <v-list-item prepend-icon="mdi-view-dashboard" title="Пользователи" to="/users"></v-list-item>
+        <v-list-item prepend-icon="mdi-view-dashboard" title="Департаменты" to="/departments"></v-list-item>
         <v-list-item prepend-icon="mdi-account" title="Должности" to="/positions"></v-list-item>
         <v-list-item prepend-icon="mdi-account" title="Категории" to="/categories"></v-list-item>
       </v-list>

@@ -3,7 +3,6 @@ const { userGet,
   userPostCreate, 
   userPostDelete, 
   userPostUpdate } = require('../controllers/userController');
-const { User } = require("../models/user.js");
 
 const userRouter = express.Router();
 
