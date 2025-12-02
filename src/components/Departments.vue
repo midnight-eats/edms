@@ -24,14 +24,11 @@
         <v-treeview
           v-model:activated="active"
           :items="items"
-          :load-children="getDepartments"
           density="compact"
           item-title="name"
           item-value="id"
           activatable
           border
-          fluid
-          open-on-click
           rounded
         ></v-treeview>
       </v-col>
@@ -69,12 +66,49 @@
   import axios from 'axios';  
 
   const departments = ref([]);
+  const active = ref([]);
   const dialog = shallowRef(false);  
   const formModel = ref(createNewRecord());
   const isEditing = toRef(() => !!formModel.value.id);
   const errorMessage = shallowRef("");
   const tempModel = createNewRecord();
   const items = ref([]);
+
+  function findItemInTree(tree, id) {
+    for (const item of tree) {
+      if (item.id === id)
+        return item;
+
+      if (item.children && item.children.length > 0) {
+        const found = findItemInTree(item.children, id);
+
+        if (found) 
+          return found;
+      }
+    }
+    return null;
+  }
+
+  watch(active, (selection) => {
+    if (selection.length > 0) {
+      const id = selection[0];
+      console.log(id);
+
+      Promise.all([axios.get(`/api/departments/children/${id}`)])
+      .then((responses) => {
+        const selectedItem = findItemInTree(items.value, id);
+        const children = responses[0].data;
+
+        if (children.length > 0) {
+          console.log('ooh');
+          selectedItem.children = [];
+
+          for (const child of children)
+            selectedItem.children.push(child);
+        }
+      });
+    }
+  }, { deep: true });
 
   function loadData() {
     Promise.all([
@@ -89,7 +123,7 @@
     return {
       id: 0,
       name: '',
-      children: departments.value
+      children: []
     };
   }
 
@@ -150,13 +184,6 @@
     console.log(formModel.value.positionId);
     errorMessage.value = "";
     dialog.value = false;
-  }
-
-  async function getDepartments (item) {
-    return fetch('/api/departments/')
-      .then(res => res.json())
-      .then(json => (item.children.push(...json)))
-      .catch(err => console.warn(err))
   }
 
   loadData();

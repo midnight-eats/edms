@@ -49,7 +49,6 @@
   </v-data-table-virtual>
   </v-sheet>
 
-
   <v-dialog v-model="dialog" max-width="500">
     <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} пользователя`">
       <template v-slot:text>

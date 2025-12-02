@@ -4,6 +4,23 @@ async function departmentGet(request, response) {
   Department.findAll({ 
     raw : true,
     where: {
+      departmentId: null,
+      is_deleted: false
+    }
+  })
+  .then((res) => {
+    response.json(res);
+  })
+  .catch(err => console.log(err));
+}
+
+async function departmentGetChildren(request, response) {
+  var id = request.params["id"];
+  
+  Department.findAll({ 
+    raw : true,
+    where: {
+      departmentId: id,
       is_deleted: false
     }
   })
@@ -62,5 +79,6 @@ module.exports = {
   departmentGet, 
   departmentPostCreate, 
   departmentPostDelete, 
-  departmentPostUpdate 
+  departmentPostUpdate,
+  departmentGetChildren
 }
