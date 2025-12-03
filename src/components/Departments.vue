@@ -15,27 +15,50 @@
         prepend-icon="mdi-plus"
         rounded="lg"
         text="Добавить"
-        @click="addItem"
+        @click="addDepartment"
       ></v-btn>
     </v-toolbar>
 
     <v-row justify="space-between" dense>
       <v-col cols="12">
         <v-treeview
-          :items="items"
-          density="compact"
+          :items="departments"
           item-title="name"
           item-value="id"
+          item-key="id"
+          density="compact"
           activatable
-          open-on-click
           border
           rounded
-        ></v-treeview>
+        >
+          <template v-slot:append="{ item }">
+            <div class="d-flex ga-2 justify-end">
+              <v-icon 
+                color="medium-emphasis" 
+                icon="mdi-plus" 
+                size="small" 
+                @click="addDepartment(item)">
+              </v-icon>
+              <v-icon 
+                color="medium-emphasis" 
+                icon="mdi-pencil" 
+                size="small" 
+                @click="editDepartment(item)">
+              </v-icon>
+              <v-icon 
+                color="medium-emphasis" 
+                icon="mdi-delete" 
+                size="small" 
+                @click="removeDepartment(item)">
+              </v-icon>
+            </div>
+          </template>
+        </v-treeview>
       </v-col>
     </v-row>
   </v-sheet>
 
-  <v-dialog v-model="dialog" max-width="500">
+  <v-dialog v-model="departmentDialog" max-width="500">
     <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} подразделения`">
       <template v-slot:text>
         <v-row>
@@ -66,42 +89,22 @@
   import axios from 'axios';  
 
   const departments = ref([]);
-  const dialog = shallowRef(false);  
-  const formModel = ref(createNewRecord());
+  const departmentDialog = shallowRef(false);  
+  const formModel = ref(createNewDepartment());
   const isEditing = toRef(() => !!formModel.value.id);
   const errorMessage = shallowRef("");
-  const tempModel = createNewRecord();
-  const items = ref([]);
-
-  function traverseTree(tree) {
-    for (const item of tree) {
-      if (item.children && item.children.length > 0)
-        traverseTree(item.children);
-      else {
-        Promise.all([
-          axios.get(`/api/departments/children/${item.id}`)
-        ])
-        .then((responses) => {
-          item.children = responses[0].data;
-          return;
-        });
-      }
-
-    }
-    return null;
-  }
+  const tempModel = createNewDepartment();
 
   function loadData() {
     Promise.all([
       axios.get('/api/departments/')
     ])
     .then((responses) => {
-      items.value = responses[0].data;
-      //traverseTree(items.value);
+      departments.value = responses[0].data;
     });
   }
 
-  function createNewRecord () {
+  function createNewDepartment () {
     return {
       id: 0,
       name: '',
@@ -109,22 +112,22 @@
     };
   }
 
-  function addItem() {
-    formModel.value = createNewRecord();
+  function addDepartment() {
+    formModel.value = createNewDepartment();
     errorMessage.value = "";
-    dialog.value = true;
+    departmentDialog.value = true;
   }
 
-  function removeItem(id) {
+  function removeDepartment(id) {
     Promise.all([axios.post(`/api/departments/delete/${id}`)])
     .then((responses) => {
-      const index = items.value.findIndex(item => item.id === id);
-      items.value.splice(index, 1);
+      const index = departments.value.findIndex(item => item.id === id);
+      departments.value.splice(index, 1);
     });
   }
 
   function editItem(id) {
-    tempModel.value = items.value.find(item => item.id === id);
+    tempModel.value = departments.value.find(item => item.id === id);
 
     formModel.value = {
       id: tempModel.value.id,
@@ -133,7 +136,7 @@
     };
 
     errorMessage.value = "";
-    dialog.value = true;
+    departmentDialog.value = true;
   }
 
   function save() {
@@ -145,8 +148,8 @@
     if (isEditing.value) {
       Promise.all([axios.post("/api/departments/update", formModel.value)])
       .then((responses) => {           
-        const index = items.value.findIndex(item => item.id === formModel.value.id);
-        items.value[index] = formModel.value;
+        const index = departments.value.findIndex(item => item.id === formModel.value.id);
+        departments.value[index] = formModel.value;
       });
     } 
     else {
@@ -154,18 +157,17 @@
       .then((responses) => { 
         var serverDepartment = responses[0].data;
         console.log(serverDepartment);     
-        items.value.push(serverDepartment);
+        departments.value.push(serverDepartment);
       });
     }
 
     errorMessage.value = "";
-    dialog.value = false;
+    departmentDialog.value = false;
   }
 
   function cancel() {
-    console.log(formModel.value.positionId);
     errorMessage.value = "";
-    dialog.value = false;
+    departmentDialog.value = false;
   }
 
   loadData();
