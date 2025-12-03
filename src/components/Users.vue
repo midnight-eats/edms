@@ -2,8 +2,8 @@
   <v-sheet border rounded>  
     <v-data-table-virtual
         :headers="headers"
-        :items="items"
-        :hide-default-footer="items.length < 20"
+        :items="users"
+        :hide-default-footer="users.length < 20"
     >
     <template v-slot:item.positionId="{ item }">
       {{ getPositionName(item.positionId) }}
@@ -25,7 +25,7 @@
           prepend-icon="mdi-plus"
           rounded="lg"
           text="Добавить"
-          @click="addItem"
+          @click="addUser"
         ></v-btn>
       </v-toolbar>
     </template>
@@ -36,20 +36,20 @@
           color="medium-emphasis" 
           icon="mdi-pencil" 
           size="small" 
-          @click="editItem(item.id)">
+          @click="editUser(item.id)">
         </v-icon>
         <v-icon 
           color="medium-emphasis" 
           icon="mdi-delete" 
           size="small" 
-          @click="removeItem(item.id)">
+          @click="removeUser(item.id)">
         </v-icon>
       </div>
     </template>
   </v-data-table-virtual>
   </v-sheet>
 
-  <v-dialog v-model="dialog" max-width="500">
+  <v-dialog v-model="userDialog" max-width="500">
     <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} пользователя`">
       <template v-slot:text>
         <v-row>
@@ -92,11 +92,11 @@
       <v-divider></v-divider>
 
       <v-card-actions class="bg-surface-light">
-        <v-btn text="Отменить" variant="plain" @click="cancel"></v-btn>
+        <v-btn text="Отменить" variant="plain" @click="cancelUser"></v-btn>
 
         <v-spacer></v-spacer>
 
-        <v-btn text="Сохранить" @click="save"></v-btn>
+        <v-btn text="Сохранить" @click="saveUser"></v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -104,9 +104,7 @@
 
 <script setup>
   import { computed, ref, shallowRef, toRef } from 'vue';
-  import axios from 'axios';  
-  import useVuelidate from '@vuelidate/core';
-  import { required } from '@vuelidate/validators';
+  import axios from 'axios';
 
   const ROLES = ["сотрудник", "оператор", "контроллер", "администратор"];
 
@@ -120,13 +118,13 @@
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
 
-  const items = ref([]);
+  const users = ref([]);
   const positions = ref([]);
-  const dialog = shallowRef(false);  
-  const formModel = ref(createNewRecord());
+  const userDialog = shallowRef(false);  
+  const formModel = ref(createNewUser());
   const isEditing = toRef(() => !!formModel.value.id);
   const errorMessage = shallowRef("");
-  const tempModel = createNewRecord();
+  const tempModel = createNewUser();
 
   function loadData() {
     Promise.all([
@@ -134,8 +132,7 @@
       axios.get('/api/positions/')
     ])
     .then((responses) => {
-      console.log('yay');
-      items.value = responses[0].data;
+      users.value = responses[0].data;
       positions.value = responses[1].data;
     });
   }
@@ -146,7 +143,7 @@
     return position ? position.name : 'Unknown';
   }
 
-  function createNewRecord () {
+  function createNewUser () {
     return {
       id: 0,
       name: '',
@@ -158,22 +155,22 @@
     };
   }
 
-  function addItem() {
-    formModel.value = createNewRecord();
+  function addUser() {
+    formModel.value = createNewUser();
     errorMessage.value = "";
-    dialog.value = true;
+    userDialog.value = true;
   }
 
-  function removeItem(id) {
+  function removeUser(id) {
     Promise.all([axios.post(`/api/users/delete/${id}`)])
     .then((responses) => {
-      const index = items.value.findIndex(item => item.id === id);
-      items.value.splice(index, 1);
+      const index = users.value.findIndex(item => item.id === id);
+      users.value.splice(index, 1);
     });
   }
 
-  function editItem(id) {
-    tempModel.value = items.value.find(item => item.id === id);
+  function editUser(id) {
+    tempModel.value = users.value.find(item => item.id === id);
 
     formModel.value = {
       id: tempModel.value.id,
@@ -186,10 +183,10 @@
     };
 
     errorMessage.value = "";
-    dialog.value = true;
+    userDialog.value = true;
   }
 
-  function save() {
+  function saveUser() {
     if (formModel.value.name.length == 0 ||
         formModel.value.username.length == 0 ||
         formModel.value.password.length == 0 ||
@@ -200,7 +197,7 @@
     }
 
 
-    var found = items.value.find(item => (item.username === formModel.value.username ||
+    var found = users.value.find(item => (item.username === formModel.value.username ||
                                           item.email === formModel.value.email));
 
     if (isEditing.value) {
@@ -213,8 +210,8 @@
 
       Promise.all([axios.post("/api/users/update", formModel.value)])
       .then((responses) => {           
-        const index = items.value.findIndex(item => item.id === formModel.value.id);
-        items.value[index] = formModel.value;
+        const index = users.value.findIndex(item => item.id === formModel.value.id);
+        users.value[index] = formModel.value;
       });
     } 
     else {
@@ -227,18 +224,18 @@
       .then((responses) => { 
         var serverUser = responses[0].data;
         console.log(serverUser);     
-        items.value.push(serverUser);
+        users.value.push(serverUser);
       });
     }
 
     errorMessage.value = "";
-    dialog.value = false;
+    userDialog.value = false;
   }
 
-  function cancel() {
+  function cancelUser() {
     console.log(formModel.value.positionId);
     errorMessage.value = "";
-    dialog.value = false;
+    userDialog.value = false;
   }
 
   loadData();
