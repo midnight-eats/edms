@@ -15,7 +15,7 @@
         prepend-icon="mdi-plus"
         rounded="lg"
         text="Добавить"
-        @click="addDepartment"
+        @click="addDepartment(null)"
       ></v-btn>
     </v-toolbar>
 
@@ -37,19 +37,19 @@
                 color="medium-emphasis" 
                 icon="mdi-plus" 
                 size="small" 
-                @click="addDepartment(item)">
+                @click="addDepartment(item.id)">
               </v-icon>
               <v-icon 
                 color="medium-emphasis" 
                 icon="mdi-pencil" 
                 size="small" 
-                @click="editDepartment(item)">
+                @click="editDepartment(item.id)">
               </v-icon>
               <v-icon 
                 color="medium-emphasis" 
                 icon="mdi-delete" 
                 size="small" 
-                @click="removeDepartment(item)">
+                @click="removeDepartment(item.id)">
               </v-icon>
             </div>
           </template>
@@ -74,11 +74,11 @@
       <v-divider></v-divider>
 
       <v-card-actions class="bg-surface-light">
-        <v-btn text="Отменить" variant="plain" @click="cancel"></v-btn>
+        <v-btn text="Отменить" variant="plain" @click="cancelDepartment"></v-btn>
 
         <v-spacer></v-spacer>
 
-        <v-btn text="Сохранить" @click="save"></v-btn>
+        <v-btn text="Сохранить" @click="saveDepartment"></v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -91,9 +91,25 @@
   const departments = ref([]);
   const departmentDialog = shallowRef(false);  
   const formModel = ref(createNewDepartment());
+  const tempModel = createNewDepartment();
   const isEditing = toRef(() => !!formModel.value.id);
   const errorMessage = shallowRef("");
-  const tempModel = createNewDepartment();
+
+  function findItem(items, id) {
+    for (const item of items) {
+      if (item.id === id)
+        return item;
+
+      if (item.children && item.children.length > 0) {
+        const found = findItem(item.children, id);
+
+        if (found) 
+          return found;
+      }
+    }
+
+    return null;
+  }
 
   function loadData() {
     Promise.all([
@@ -108,12 +124,13 @@
     return {
       id: 0,
       name: '',
-      children: []
+      departmentId: null
     };
   }
 
-  function addDepartment() {
+  function addDepartment(id) {
     formModel.value = createNewDepartment();
+    formModel.value.departmentId = id;
     errorMessage.value = "";
     departmentDialog.value = true;
   }
@@ -126,21 +143,22 @@
     });
   }
 
-  function editItem(id) {
-    tempModel.value = departments.value.find(item => item.id === id);
+  function editDepartment(id) {
+    tempModel.value = findItem(departments, id);
 
     formModel.value = {
       id: tempModel.value.id,
       name: tempModel.value.name,
-      children: tempModel.value.children
+      children: tempModel.value.children,
+      departmentId: tempModel.value.departmentId
     };
 
     errorMessage.value = "";
     departmentDialog.value = true;
   }
 
-  function save() {
-    if (formModel.value.name.length == 0) {
+  function saveDepartment() {
+    if (formModel.value.name.length === 0) {
       errorMessage.value = "Все поля должны быть заполнены";
       return;
     }
@@ -151,13 +169,22 @@
         const index = departments.value.findIndex(item => item.id === formModel.value.id);
         departments.value[index] = formModel.value;
       });
-    } 
-    else {
+    } else {
       Promise.all([axios.post("/api/departments/create", formModel.value)])
       .then((responses) => { 
         var serverDepartment = responses[0].data;
-        console.log(serverDepartment);     
-        departments.value.push(serverDepartment);
+        console.log(serverDepartment.departmentId);     
+        const department = findItem(departments.value, serverDepartment.departmentId);
+        console.log(department.id);   
+        
+        if (department) {
+          if (department.children)
+            department.children.push(serverDepartment);
+          else
+            department.children = [serverDepartment];
+        } else {
+          departments.value.push(serverDepartment);
+        }
       });
     }
 
@@ -165,7 +192,7 @@
     departmentDialog.value = false;
   }
 
-  function cancel() {
+  function cancelDepartment() {
     errorMessage.value = "";
     departmentDialog.value = false;
   }
