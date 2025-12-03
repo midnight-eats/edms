@@ -49,7 +49,7 @@
                 color="medium-emphasis" 
                 icon="mdi-delete" 
                 size="small" 
-                @click="removeDepartment(item.id)">
+                @click="removeDepartment(item.id, item.departmentId)">
               </v-icon>
             </div>
           </template>
@@ -85,7 +85,7 @@
 </template>
 
 <script setup>
-  import { ref, shallowRef, toRef, watch } from 'vue';
+  import { ref, shallowRef, toRef } from 'vue';
   import axios from 'axios';  
 
   const departments = ref([]);
@@ -135,21 +135,35 @@
     departmentDialog.value = true;
   }
 
-  function removeDepartment(id) {
+  function removeDepartment(id, parentId) {
     Promise.all([axios.post(`/api/departments/delete/${id}`)])
     .then((responses) => {
-      const index = departments.value.findIndex(item => item.id === id);
-      departments.value.splice(index, 1);
+      const department = findItem(departments.value, parentId);
+      department = formModel.value;
+      if (department) {
+        if (department.children) {
+          const index = department.children.findIndex(item => item.id === id);
+          department.children.splice(index, 1);
+        }
+      } else {
+        const index = departments.value.findIndex(item => item.id === id);
+        department.value.splice(index, 1);
+      }
     });
   }
 
   function editDepartment(id) {
-    tempModel.value = findItem(departments, id);
+    const found = findItem(departments.value, id);
+
+    tempModel.value = {
+      id: id,
+      name: found.name,
+      departmentId: found.departmentId
+    };
 
     formModel.value = {
       id: tempModel.value.id,
       name: tempModel.value.name,
-      children: tempModel.value.children,
       departmentId: tempModel.value.departmentId
     };
 
@@ -166,16 +180,16 @@
     if (isEditing.value) {
       Promise.all([axios.post("/api/departments/update", formModel.value)])
       .then((responses) => {           
-        const index = departments.value.findIndex(item => item.id === formModel.value.id);
-        departments.value[index] = formModel.value;
+        const department = findItem(departments.value, formModel.value.id);
+        department.id = formModel.value.id;
+        department.name = formModel.value.name;
+        department.departmentId = formModel.value.departmentId;
       });
     } else {
       Promise.all([axios.post("/api/departments/create", formModel.value)])
       .then((responses) => { 
-        var serverDepartment = responses[0].data;
-        console.log(serverDepartment.departmentId);     
+        var serverDepartment = responses[0].data;   
         const department = findItem(departments.value, serverDepartment.departmentId);
-        console.log(department.id);   
         
         if (department) {
           if (department.children)

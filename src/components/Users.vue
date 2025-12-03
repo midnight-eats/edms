@@ -45,7 +45,7 @@
           @click="removeItem(item.id)">
         </v-icon>
       </div>
-    </template>  
+    </template>
   </v-data-table-virtual>
   </v-sheet>
 
