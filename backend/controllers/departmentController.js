@@ -2,14 +2,28 @@ const { Department } = require("../models/department.js");
 
 async function departmentGet(request, response) {
   Department.findAll({ 
-    raw : true,
+    raw: true,
     where: {
-      departmentId: null,
       is_deleted: false
     }
   })
   .then((res) => {
-    response.json(res);
+    var arr = [];
+
+    for (r of res) {
+      if (r.departmentId === null)
+        arr.push(r);
+      else {
+        var found = res.find(item => item.id === r.departmentId);
+
+        if (!found.children)
+          found.children = [r];
+        else
+          found.children.push(r);
+      }
+    }
+
+    response.json(arr);
   })
   .catch(err => console.log(err));
 }

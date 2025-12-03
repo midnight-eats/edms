@@ -22,12 +22,12 @@
     <v-row justify="space-between" dense>
       <v-col cols="12">
         <v-treeview
-          v-model:activated="active"
           :items="items"
           density="compact"
           item-title="name"
           item-value="id"
           activatable
+          open-on-click
           border
           rounded
         ></v-treeview>
@@ -35,7 +35,7 @@
     </v-row>
   </v-sheet>
 
-    <v-dialog v-model="dialog" max-width="500">
+  <v-dialog v-model="dialog" max-width="500">
     <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} подразделения`">
       <template v-slot:text>
         <v-row>
@@ -66,7 +66,6 @@
   import axios from 'axios';  
 
   const departments = ref([]);
-  const active = ref([]);
   const dialog = shallowRef(false);  
   const formModel = ref(createNewRecord());
   const isEditing = toRef(() => !!formModel.value.id);
@@ -74,41 +73,23 @@
   const tempModel = createNewRecord();
   const items = ref([]);
 
-  function findItemInTree(tree, id) {
+  function traverseTree(tree) {
     for (const item of tree) {
-      if (item.id === id)
-        return item;
-
-      if (item.children && item.children.length > 0) {
-        const found = findItemInTree(item.children, id);
-
-        if (found) 
-          return found;
+      if (item.children && item.children.length > 0)
+        traverseTree(item.children);
+      else {
+        Promise.all([
+          axios.get(`/api/departments/children/${item.id}`)
+        ])
+        .then((responses) => {
+          item.children = responses[0].data;
+          return;
+        });
       }
+
     }
     return null;
   }
-
-  watch(active, (selection) => {
-    if (selection.length > 0) {
-      const id = selection[0];
-      console.log(id);
-
-      Promise.all([axios.get(`/api/departments/children/${id}`)])
-      .then((responses) => {
-        const selectedItem = findItemInTree(items.value, id);
-        const children = responses[0].data;
-
-        if (children.length > 0) {
-          console.log('ooh');
-          selectedItem.children = [];
-
-          for (const child of children)
-            selectedItem.children.push(child);
-        }
-      });
-    }
-  }, { deep: true });
 
   function loadData() {
     Promise.all([
@@ -116,6 +97,7 @@
     ])
     .then((responses) => {
       items.value = responses[0].data;
+      //traverseTree(items.value);
     });
   }
 
