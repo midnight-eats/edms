@@ -60,8 +60,8 @@
       <v-col cols="8">
         <v-data-table-virtual
             :headers="headers"
-            :items="users"
-            :hide-default-footer="users.length < 20"
+            :items="filteredUsers"
+            :hide-default-footer="filteredUsers.length < 20"
         >
           <template v-slot:item.positionId="{ item }">
             {{ getPositionName(item.positionId) }}
@@ -109,6 +109,7 @@
     </v-row>
   </v-container>
   </v-sheet>
+
   <v-dialog v-model="departmentDialog" max-width="500">
     <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} подразделения`">
       <template v-slot:text>
@@ -188,7 +189,7 @@
 </template>
 
 <script setup>
-  import { ref, shallowRef, toRef } from 'vue';
+  import { computed, ref, shallowRef, toRef } from 'vue';
   import axios from 'axios';  
 import { requiredIf } from '@vuelidate/validators';
   
@@ -204,6 +205,9 @@ import { requiredIf } from '@vuelidate/validators';
   const isEditing = toRef(() => !!formModel.value.id);
   const errorMessage = shallowRef("");
   const selectedDepartment = ref([]);
+  const filteredUsers = computed(() => {
+    return users.value.filter(item => item.departmentId === selectedDepartment.value[0]);
+  })
 
   const headers = [
     { title: 'ID', align: 'start', key: 'id' },
@@ -253,6 +257,7 @@ import { requiredIf } from '@vuelidate/validators';
   }
 
   function addDepartment(parentId) {
+    console.log(selectedDepartment.value[0]);
     formModel.value = createNewDepartment();
     formModel.value.departmentId = parentId;
     errorMessage.value = "";
