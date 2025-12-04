@@ -1,6 +1,7 @@
 <template>
-  <v-container border rounded>
-     <v-row dense>
+  <v-sheet border rounded>
+  <v-container>
+    <v-row dense>
       <v-col cols="4">
         <v-toolbar flat>
         <v-toolbar-title>
@@ -23,12 +24,12 @@
 
         <v-treeview
           :items="departments"
+          v-model:activated="selectedDepartment"
           item-title="name"
           item-value="id"
           item-key="id"
           density="compact"
           activatable
-          border
           rounded
         >
           <template v-slot:append="{ item }">
@@ -49,7 +50,7 @@
                 color="medium-emphasis" 
                 icon="mdi-delete" 
                 size="small" 
-                @click="removeDepartment(item.id, item.departmentId)">
+                @click="removeDepartment(item)">
               </v-icon>
             </div>
           </template>
@@ -107,7 +108,7 @@
       </v-col>
     </v-row>
   </v-container>
-
+  </v-sheet>
   <v-dialog v-model="departmentDialog" max-width="500">
     <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} подразделения`">
       <template v-slot:text>
@@ -189,6 +190,7 @@
 <script setup>
   import { ref, shallowRef, toRef } from 'vue';
   import axios from 'axios';  
+import { requiredIf } from '@vuelidate/validators';
   
   const ROLES = ["сотрудник", "оператор", "контроллер", "администратор"];
 
@@ -197,10 +199,11 @@
   const userDialog = shallowRef(false); 
   const departments = ref([]);
   const departmentDialog = shallowRef(false);  
-  const formModel = ref(createNewDepartment());
-  const tempModel = createNewDepartment();
+  const formModel = ref(null);
+  const tempModel = null;
   const isEditing = toRef(() => !!formModel.value.id);
   const errorMessage = shallowRef("");
+  const selectedDepartment = ref([]);
 
   const headers = [
     { title: 'ID', align: 'start', key: 'id' },
@@ -249,26 +252,26 @@
     };
   }
 
-  function addDepartment(id) {
+  function addDepartment(parentId) {
     formModel.value = createNewDepartment();
-    formModel.value.departmentId = id;
+    formModel.value.departmentId = parentId;
     errorMessage.value = "";
     departmentDialog.value = true;
   }
 
-  function removeDepartment(id, parentId) {
-    Promise.all([axios.post(`/api/departments/delete/${id}`)])
+  function removeDepartment(item) {
+    console.log(item.id);
+    Promise.all([axios.post(`/api/departments/delete`, item)])
     .then((responses) => {
-      const department = findItem(departments.value, parentId);
-      department = formModel.value;
-      if (department) {
-        if (department.children) {
-          const index = department.children.findIndex(item => item.id === id);
-          department.children.splice(index, 1);
-        }
+      console.log(responses[0].data);
+
+      if (item.departmentId === null) {
+        const index = departments.value.findIndex(dept => dept.id === item.id);
+        departments.value.splice(index, 1);
       } else {
-        const index = departments.value.findIndex(item => item.id === id);
-        department.value.splice(index, 1);
+        const department = findItem(departments.value, item.departmentId);
+        const index = department.children.findIndex(dept => dept.id === item.id);
+        department.children.splice(index, 1);
       }
     });
   }

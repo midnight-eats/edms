@@ -1,7 +1,7 @@
 const { Department } = require("../models/department.js");
 
 async function departmentGet(request, response) {
-  Department.findAll({ 
+  await Department.findAll({ 
     raw: true,
     where: {
       is_deleted: false
@@ -29,25 +29,35 @@ async function departmentGet(request, response) {
 }
 
 async function departmentPostDelete(request, response) {
-  var id = request.params["id"];
+  const item = request.body;
 
-  Department.update({ 
-      is_deleted: true
-    }, {
-      where: {
-        id: id
-      }
-    })
-    .then((res) => {
-      response.json(res);
-    })
-    .catch(err => console.log(err));
+  await deleteDepartmentRecursive(item)
+  .then(res => {
+    response.json(res);
+  })
+  .catch(err => console.log(err));
+}
+
+async function deleteDepartmentRecursive(item) {
+  if (item.children && item.children.length > 0) {
+    for (const child of item.children) {
+      deleteDepartmentRecursive(child);
+    }
+  }
+
+  await Department.update({ 
+    is_deleted: true
+  }, {
+    where: {
+      id: item.id
+    }
+  })
 }
 
 async function departmentPostCreate(request, response) {
   var department = request.body;
   console.log(`Create ${department}`)
-  Department.create({
+  await Department.create({
       name: department.name,
       departmentId: department.departmentId
     })
@@ -60,7 +70,7 @@ async function departmentPostCreate(request, response) {
 async function departmentPostUpdate(request, response) {
   var department = request.body;
   console.log(`Update ${department}`)
-  Department.update({ 
+  await Department.update({ 
       name: department.name,
       departmentId: department.departmentId
     }, {
