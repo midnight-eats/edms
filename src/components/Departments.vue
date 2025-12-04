@@ -1,6 +1,6 @@
 <template>
   <v-sheet border rounded>
-  <v-container>
+  <v-container fluid class="fill-height pa-0">
     <v-row dense>
       <v-col cols="4">
         <v-toolbar flat>
@@ -280,13 +280,8 @@
   }
 
   function editDepartment(id) {
-    const found = findItem(departments.value, id);
-
-    tempModel.value = {
-      id: id,
-      name: found.name,
-      departmentId: found.departmentId
-    };
+    tempModel.value = createNewDepartment();
+    tempModel.value = findItem(departments.value, id);
 
     formModel.value = {
       id: tempModel.value.id,
