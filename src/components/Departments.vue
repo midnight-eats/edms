@@ -190,8 +190,7 @@
 
 <script setup>
   import { computed, ref, shallowRef, toRef } from 'vue';
-  import axios from 'axios';  
-import { requiredIf } from '@vuelidate/validators';
+  import axios from 'axios'; 
   
   const ROLES = ["сотрудник", "оператор", "контроллер", "администратор"];
 
@@ -201,7 +200,7 @@ import { requiredIf } from '@vuelidate/validators';
   const departments = ref([]);
   const departmentDialog = shallowRef(false);  
   const formModel = ref(null);
-  const tempModel = null;
+  const tempModel = ref(null);
   const isEditing = toRef(() => !!formModel.value.id);
   const errorMessage = shallowRef("");
   const selectedDepartment = ref([]);
@@ -257,7 +256,6 @@ import { requiredIf } from '@vuelidate/validators';
   }
 
   function addDepartment(parentId) {
-    console.log(selectedDepartment.value[0]);
     formModel.value = createNewDepartment();
     formModel.value.departmentId = parentId;
     errorMessage.value = "";
@@ -353,8 +351,9 @@ import { requiredIf } from '@vuelidate/validators';
       username: '',
       password: '',
       email: '',
-      role: '',
-      positionId: null
+      role: 'сотрудник',
+      positionId: null,
+      departmentId: selectedDepartment.value[0]
     };
   }
 
@@ -373,6 +372,7 @@ import { requiredIf } from '@vuelidate/validators';
   }
 
   function editUser(id) {
+    tempModel.value = createNewUser();
     tempModel.value = users.value.find(item => item.id === id);
 
     formModel.value = {
@@ -382,7 +382,8 @@ import { requiredIf } from '@vuelidate/validators';
       password: tempModel.value.password,
       email: tempModel.value.email,
       role: tempModel.value.role,
-      positionId: tempModel.value.positionId
+      positionId: tempModel.value.positionId,
+      departmentId: tempModel.value.departmentId
     };
 
     errorMessage.value = "";

@@ -38,7 +38,8 @@ async function userPostCreate(request, response) {
       password: user.password,
       email: user.email,
       role: user.role,
-      positionId: user.positionId
+      positionId: user.positionId,
+      departmentId: user.departmentId, 
     })
     .then(res => {
       response.json(res);
@@ -55,7 +56,8 @@ async function userPostUpdate(request, response) {
       password: user.password,
       email: user.email,
       role: user.role,
-      positionId: user.positionId
+      positionId: user.positionId,
+      departmentId: user.departmentId, 
     }, {
       where: {
         id: user.id
