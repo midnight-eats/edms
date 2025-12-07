@@ -1,4 +1,8 @@
 const { Department } = require("../models/department.js");
+const { Document } = require("../models/document.js");
+const { RouteStage } = require("../models/routeStage.js");
+const { Route } = require("../models/route.js");
+const { RouteStageUser } = require("../models/routeStageUser.js");
 
 async function departmentGet(request, response) {
   await Department.findAll({ 

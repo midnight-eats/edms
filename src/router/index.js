@@ -11,6 +11,7 @@ import Users from '@/components/Users.vue'
 import Departments from '@/components/Departments.vue'
 import Positions from '@/components/Positions.vue'
 import Categories from '@/components/Categories.vue'
+import Documents from '@/components/Documents.vue'
 import index from '@/pages/index.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
@@ -20,6 +21,7 @@ const routes = [
   { path: '/departments', component: Departments },
   { path: '/positions', component: Positions },
   { path: '/categories', component: Categories },
+  { path: '/documents', component: Documents },
   //{ path: '/profile', component: ProfileView },
 ];
 
