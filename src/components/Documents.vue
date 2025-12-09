@@ -46,7 +46,7 @@
   </v-data-table-virtual>
   </v-sheet>
 
-  <v-dialog v-model="documentDialog" max-width="1100">
+  <v-dialog v-model="documentDialog" max-width="1200">
     <v-card :title="`${isEditingDocument ? 'Изменение' : 'Добавление'} документа`">
     <container class="pr-6 pl-6 pb-6">
     <v-tabs v-model="tab" color="primary">
@@ -97,6 +97,10 @@
             >
               <template v-slot:item.all_or_one="{ item }">
                 {{ item.all_or_one ? "Согласие всех участников" : "Согласие одного участника" }}
+              </template>
+
+              <template v-slot:item.routeStageUsers="{ item }">
+                {{ formatRouteStageUsers(item.routeStageUsers) }}
               </template>
 
               <template v-slot:top>
@@ -153,7 +157,7 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="routeStageDialog" max-width="1000">
+  <v-dialog v-model="routeStageDialog" max-width="1100">
     <v-card :title="`${isEditingRouteStage ? 'Изменение' : 'Добавление'} этапа`">
       <container class="pr-6 pl-6">
         <v-row class="pt-6">
@@ -176,18 +180,7 @@
             label="Дата окончания"
             ></v-date-input>
           </v-col>
-        </v-row>  
-        <v-row>
-          <v-col>
-            <v-radio-group v-model="routeStageModel.all_or_one">
-              <v-radio 
-              label="Согласие одного участника"
-              :value="false"></v-radio>
-              <v-radio label="Согласие всех участников"
-              :value="true"></v-radio>
-            </v-radio-group>
-          </v-col>
-        </v-row>       
+        </v-row>     
         <v-row class="pa-3">
           <v-data-table-virtual
             :headers="routeStageUserHeaders"
@@ -221,18 +214,27 @@
               <div class="d-flex ga-2 justify-end">
                 <v-icon 
                   color="medium-emphasis" 
-                  icon="mdi-pencil" 
-                  size="small">
-                </v-icon>
-                <v-icon 
-                  color="medium-emphasis" 
                   icon="mdi-delete" 
-                  size="small">
-                </v-icon>
+                  size="small"
+                  @click="removeRouteStageUser(item.id)"></v-icon>
               </div>
             </template>  
           </v-data-table-virtual>
         </v-row>
+        <v-row>
+          <v-col>
+            <v-radio-group
+            v-if="routeStageModel.routeStageUsers.length > 1"
+            v-model="routeStageModel.all_or_one"
+            label="Условие перехода на следующий этап">
+              <v-radio 
+              label="Согласие одного участника"
+              :value="false"></v-radio>
+              <v-radio label="Согласие всех участников"
+              :value="true"></v-radio>
+            </v-radio-group>
+          </v-col>
+        </v-row>    
       </container>
 
     <v-divider></v-divider>
@@ -252,7 +254,7 @@
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="userDialog" max-width="900">
+  <v-dialog v-model="userDialog" max-width="1000">
     <v-card :title="`Добавление участника`">
       <v-container fluid class="fill-height pa-0">
         <v-row dense>
@@ -286,10 +288,6 @@
                 :items="filteredUsers"
                 :hide-default-footer="filteredUsers.length < 20"
             >
-              <template v-slot:item.positionId="{ item }">
-                {{ getPositionName(item.positionId) }}
-              </template>
-
               <template v-slot:top>
                 <v-toolbar flat>
                   <v-toolbar-title>
@@ -350,6 +348,8 @@
     { title: 'Порядковый номер', align: 'start', key: 'step' },
     { title: 'Условие перехода на след. этап', align: 'start', key: 'all_or_one' },
     { title: 'Дата начала', align: 'start', key: 'start_date' },
+    { title: 'Дата окончания', align: 'start', key: 'end_date' },
+    { title: 'Участники', align: 'start', key: 'routeStageUsers' },
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
 
@@ -358,8 +358,8 @@
     { title: 'Логин', align: 'start', key: 'username' },
     { title: 'Эл. почта', align: 'start', key: 'email' },
     { title: 'Роль', align: 'start', key: 'role' },
-    { title: 'Должность', align: 'start', key: 'positionId' },
-    { title: 'Подразделение', align: 'start', key: 'departmentId' },
+    { title: 'Должность', align: 'start', key: 'position.name' },
+    { title: 'Подразделение', align: 'start', key: 'department.name' },
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
 
@@ -368,11 +368,9 @@
     { title: 'Логин', align: 'start', key: 'username' },
     { title: 'Эл. почта', align: 'start', key: 'email' },
     { title: 'Роль', align: 'start', key: 'role' },
-    { title: 'Должность', align: 'start', key: 'positionId' },
+    { title: 'Должность', align: 'start', key: 'position.name' },
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
-
-  const ROLES = ["сотрудник", "оператор", "контроллер", "администратор"];
 
   const tab = ref('document');
   const documents = ref([]);
@@ -389,7 +387,6 @@
   const selectedDepartment = ref([]);
   const departments = ref([]);
   const users = ref([]);
-  const positions = ref([]);
   const filteredUsers = computed(() => {
     return users.value.filter(item => item.departmentId === selectedDepartment.value[0]);
   })
@@ -401,33 +398,6 @@
     .then((responses) => {
       documents.value = responses[0].data;
     });
-  }
-
-
-  function findItem(items, id) {
-    for (const item of items) {
-      if (item.id === id)
-        return item;
-
-      if (item.children && item.children.length > 0) {
-        const found = findItem(item.children, id);
-
-        if (found) 
-          return found;
-      }
-    }
-
-    return null;
-  }
-
-  function getPositionName(positionId) {
-    const position = positions.value.find(pos => pos.id === positionId);
-    return position.name;
-  }
-
-  function getDepartmentName(departmentId) {
-    const department = findItem(departments.value, departmentId);
-    return department.name;
   }
 
   function createNewDocument () {
@@ -505,18 +475,34 @@
     documentDialog.value = false;
   }
 
+  function formatRouteStageUsers(routeStageUsers) {
+    let mergedList = '';
+    let len = routeStageUsers.length;
+
+    for (let i = 0; i < len; i++) {
+      mergedList += routeStageUsers[i]['position.name'] +
+                    ' ' +
+                    routeStageUsers[i].name;
+
+      if (i < len - 1)
+        mergedList += ', ';
+    }
+
+    return mergedList;
+  }
+
   function addRouteStage() {
     routeStageModel.value = createNewRouteStage();
     routeStageDialog.value = true;
   }
 
   function removeRouteStage(id) {
-    const index = documents.value.route.routeStages.findIndex(item => item.id === id);
-    documents.value.route.routeStages.splice(index, 1);
+    const index = documentModel.value.route.routeStages.findIndex(item => item.id === id);
+    documentModel.value.route.routeStages.splice(index, 1);
   }
 
   function editRouteStage(id) {
-    tempRouteStageModel.value = documents.value.route.routeStages.find(item => item.id === id);
+    tempRouteStageModel.value = documentModel.value.route.routeStages.find(item => item.id === id);
 
     routeStageModel.value = {
       id: tempRouteStageModel.value.id,
@@ -536,7 +522,7 @@
       //const index = documents.value.route.routeStages.findIndex(item => item.id === routeStageModel.value.id);
       //documents.value.route.routeStages[index] = routeStageModel.value;
     } 
-    else {   
+    else {
       routeStageModel.value.step = documentModel.value.route.routeStages.length + 1;
       documentModel.value.route.routeStages.push(routeStageModel.value);
       console.log(documentModel.value.route.routeStages[0].name);
@@ -557,22 +543,20 @@
 
   function addRouteStageUser() {
     Promise.all([
-      axios.get('/api/departments'),
-      axios.get('/api/users/'),
-      axios.get('/api/positions/')
+      axios.get('/api/users/plain'),
+      axios.get('/api/departments/'),      
     ])
     .then((responses) => {
-      departments.value = responses[0].data;
-      users.value = responses[1].data;
-      positions.value = responses[2].data;
+      users.value = responses[0].data;
+      departments.value = responses[1].data;
     });
 
     userDialog.value = true;
   }
 
   function removeRouteStageUser(id) {
-    const index = documents.value.route.routeStages.findIndex(item => item.id === id);
-    documents.value.route.routeStages.splice(index, 1);
+    const index = routeStageModel.value.routeStageUsers.findIndex(item => item.id === id);
+    routeStageModel.value.routeStageUsers.splice(index, 1);
   }
 
   async function saveRouteStageUser(user) {

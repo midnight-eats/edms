@@ -1,7 +1,26 @@
 const { User } = require("../models/user.js");
+const { Position } = require("../models/position.js");
+const { Department } = require("../models/department.js");
 
 async function userGet(request, response) {
-  User.findAll({ 
+  User.findAll({
+    raw : true,
+    where: {
+      is_deleted: false
+    }
+  })
+  .then((res) => {
+    response.json(res);
+  })
+  .catch(err => console.log(err));
+}
+
+async function userGetPlain(request, response) {
+  User.findAll({
+    include: [
+      Position,
+      Department
+    ],
     raw : true,
     where: {
       is_deleted: false
@@ -69,7 +88,8 @@ async function userPostUpdate(request, response) {
 }
 
 module.exports = { 
-  userGet, 
+  userGet,
+  userGetPlain,
   userPostCreate, 
   userPostDelete, 
   userPostUpdate 
