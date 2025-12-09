@@ -21,12 +21,6 @@ const Document = connection.define("documents", {
   },
   description: {
     type: Sequelize.STRING(100),
-    allowNull: false,
-    validate: {
-      notEmpty: {
-        msg: 'Description cannot be empty'
-      }
-    }
   },
   is_deleted: {
     type: Sequelize.BOOLEAN,

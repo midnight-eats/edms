@@ -32,6 +32,19 @@ async function departmentGet(request, response) {
   .catch(err => console.log(err));
 }
 
+async function departmentGetPlain(request, response) {
+  await Department.findAll({ 
+    raw: true,
+    where: {
+      is_deleted: false
+    }
+  })
+  .then((res) => {
+    response.json(arr);
+  })
+  .catch(err => console.log(err));
+}
+
 async function departmentPostDelete(request, response) {
   const item = request.body;
 
@@ -89,6 +102,7 @@ async function departmentPostUpdate(request, response) {
 
 module.exports = { 
   departmentGet, 
+  departmentGetPlain,
   departmentPostCreate, 
   departmentPostDelete, 
   departmentPostUpdate

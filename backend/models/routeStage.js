@@ -41,6 +41,15 @@ const RouteStage = connection.define("routes_stages", {
       }
     }
   },
+  end_date: {
+    type: Sequelize.DATE,
+    allowNull: false,
+    validate: {
+      notEmpty: {
+        msg: 'End date cannot be empty'
+      }
+    }
+  },
   is_deleted: {
     type: Sequelize.BOOLEAN,
     allowNull: false,

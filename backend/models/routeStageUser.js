@@ -25,7 +25,7 @@ const RouteStageUser = connection.define("routes_stage_users", {
 });
 
 RouteStageUser.belongsTo(RouteStage);
-RouteStageUser.hasMany(User);
+RouteStageUser.hasOne(User);
 
 connection.sync({force: false, alter: true}).then(result => {
   console.log(result);
