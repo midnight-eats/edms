@@ -30,7 +30,6 @@ const Route = connection.define("routes", {
 });
 
 Route.belongsTo(Document);
-Route.belongsTo(RouteStage);
 Route.hasMany(RouteStage);
 
 connection.sync({force: false, alter: true}).then(result => {

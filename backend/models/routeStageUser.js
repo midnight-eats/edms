@@ -4,7 +4,7 @@ const connection = Connection.getConnection();
 const { RouteStage } = require("./routeStage.js");
 const { User } = require("./user.js");
 
-const RouteStageUser = connection.define("routes_stage_users", {
+const RouteStageUser = connection.define("route_stage_users", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
@@ -25,7 +25,7 @@ const RouteStageUser = connection.define("routes_stage_users", {
 });
 
 RouteStageUser.belongsTo(RouteStage);
-RouteStageUser.hasOne(User);
+RouteStageUser.belongsTo(User);
 
 connection.sync({force: false, alter: true}).then(result => {
   console.log(result);

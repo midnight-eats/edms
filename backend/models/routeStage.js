@@ -2,7 +2,7 @@ const Connection = require("../connection.js")
 const { Sequelize } = require('sequelize');
 const connection = Connection.getConnection();
 
-const RouteStage = connection.define("routes_stages", {
+const RouteStage = connection.define("route_stages", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
@@ -38,15 +38,6 @@ const RouteStage = connection.define("routes_stages", {
     validate: {
       notEmpty: {
         msg: 'Start date cannot be empty'
-      }
-    }
-  },
-  end_date: {
-    type: Sequelize.DATE,
-    allowNull: false,
-    validate: {
-      notEmpty: {
-        msg: 'End date cannot be empty'
       }
     }
   },

@@ -5,6 +5,10 @@
     :items="documents"
     :hide-default-footer="documents.length < 20"
   >
+    <template v-slot:item.start_date="{ item }">
+      {{ item.created_at.toLocaleDateString('ru-RU') }}
+    </template>
+
     <template v-slot:top>
       <v-toolbar flat>
         <v-toolbar-title>
@@ -69,11 +73,12 @@
           </v-row>
           <v-row>
             <v-col cols="12">
-              <v-text-field 
-                v-model="documentModel.description"
-                label="Описание"
+              <v-textarea
+                v-model="documentModel.body"
+                label="Содержимое"
+                auto-grow
                 required
-              ></v-text-field>
+              ></v-textarea>
             </v-col>
           </v-row>
         </container>
@@ -98,9 +103,11 @@
               <template v-slot:item.all_or_one="{ item }">
                 {{ item.all_or_one ? "Согласие всех участников" : "Согласие одного участника" }}
               </template>
-
               <template v-slot:item.routeStageUsers="{ item }">
                 {{ formatRouteStageUsers(item.routeStageUsers) }}
+              </template>
+              <template v-slot:item.start_date="{ item }">
+                {{ item.start_date.toLocaleDateString('ru-RU') }}
               </template>
 
               <template v-slot:top>
@@ -124,13 +131,13 @@
                     color="medium-emphasis" 
                     icon="mdi-pencil" 
                     size="small" 
-                    @click="editRouteStage(item.id)">
+                    @click="editRouteStage(item.step)">
                   </v-icon>
                   <v-icon 
                     color="medium-emphasis" 
                     icon="mdi-delete" 
                     size="small" 
-                    @click="removeRouteStage(item.id)">
+                    @click="removeRouteStage(item.step)">
                   </v-icon>
                 </div>
               </template>  
@@ -161,23 +168,31 @@
     <v-card :title="`${isEditingRouteStage ? 'Изменение' : 'Добавление'} этапа`">
       <container class="pr-6 pl-6">
         <v-row class="pt-6">
-          <v-text-field 
-            v-model="routeStageModel.name"
-            label="Название"
-            required
-          ></v-text-field>
+          <v-col>
+            <v-text-field 
+              v-model="routeStageModel.name"
+              label="Название"
+              required
+            ></v-text-field>
+          </v-col>
         </v-row>
         <v-row>
-          <v-col>
+          <v-col cols="4">
+            <v-number-input
+              v-model="routeStageModel.duration"
+              :reverse="false"
+              controlVariant="default"
+              label="Длительность"
+              :hideInput="false"
+              :inset="false"
+              :min="1"
+            ></v-number-input>
+          </v-col>
+          <v-col cols="8">
             <v-date-input
+            v-if="!documentModel.route.routeStages.length > 0"
             v-model="routeStageModel.start_date"
             label="Дата начала"
-            ></v-date-input>
-          </v-col>
-          <v-col>
-            <v-date-input
-            v-model="routeStageModel.end_date"
-            label="Дата окончания"
             ></v-date-input>
           </v-col>
         </v-row>     
@@ -189,7 +204,6 @@
           <template v-slot:item.positionId="{ item }">
             {{ getPositionName(item.positionId) }}
           </template>
-
           <template v-slot:item.departmentId="{ item }">
             {{ getDepartmentName(item.departmentId) }}
           </template>
@@ -333,12 +347,12 @@
   import { computed, ref, shallowRef, toRef } from 'vue';
   import axios from 'axios';
   import { VDateInput } from 'vuetify/labs/VDateInput'
-  import { useDate } from 'vuetify'
+  import { useLocale } from 'vuetify'
 
   const headers = [
     { title: 'ID', align: 'start', key: 'id' },
     { title: 'Название', align: 'start', key: 'name' },
-    { title: 'Описание', align: 'start', key: 'description' },
+    { title: 'Описание', align: 'start', key: 'body' },
     { title: 'Дата создания', align: 'start', key: 'created_at' },
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
@@ -348,7 +362,7 @@
     { title: 'Порядковый номер', align: 'start', key: 'step' },
     { title: 'Условие перехода на след. этап', align: 'start', key: 'all_or_one' },
     { title: 'Дата начала', align: 'start', key: 'start_date' },
-    { title: 'Дата окончания', align: 'start', key: 'end_date' },
+    { title: 'Длительность', align: 'start', key: 'duration' },
     { title: 'Участники', align: 'start', key: 'routeStageUsers' },
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
@@ -397,6 +411,9 @@
     ])
     .then((responses) => {
       documents.value = responses[0].data;
+
+      for (const document of documents.value)
+        document.created_at = new Date(document.created_at);
     });
   }
 
@@ -404,7 +421,8 @@
     return {
       id: 0,
       name: '',
-      description: '',
+      body: '',
+      created_at: new Date(),
       route: {
         id: 0,
         name: '',
@@ -420,13 +438,21 @@
       step: 1,
       all_or_one: false,
       duration: 1,
-      start_date: null,
-      end_date: null,
+      start_date: new Date(),
       routeStageUsers: []
     }
   }
 
   function addDocument() {
+    Promise.all([
+      axios.get('/api/users/plain'),
+      axios.get('/api/departments/'),      
+    ])
+    .then((responses) => {
+      users.value = responses[0].data;
+      departments.value = responses[1].data;
+    });
+
     documentModel.value = createNewDocument();
     documentDialog.value = true;
   }
@@ -445,6 +471,8 @@
     documentModel.value = {
       id: tempDocumentModel.value.id,
       name: tempDocumentModel.value.name,
+      body: tempDocumentModel.value.body,
+      created_at: tempDocumentModel.value.created_at,
       route: tempDocumentModel.value.route
     };
 
@@ -460,6 +488,8 @@
       });
     } 
     else {
+      documentModel.value.created_at = documentModel.value.route.routeStages[0].start_date;
+
       Promise.all([axios.post("/api/documents/create", documentModel.value)])
       .then((responses) => { 
         var serverDocument = responses[0].data;
@@ -493,15 +523,25 @@
 
   function addRouteStage() {
     routeStageModel.value = createNewRouteStage();
+    const len = documentModel.value.route.routeStages.length;
+
+    if (len > 0)
+      routeStageModel.value.start_date.setDate(routeStageModel.value.start_date.getDate() + 
+                                        documentModel.value.route.routeStages[len - 1].step);
+    
     routeStageDialog.value = true;
   }
 
-  function removeRouteStage(id) {
-    const index = documentModel.value.route.routeStages.findIndex(item => item.id === id);
+  function removeRouteStage(step) {
+    const index = documentModel.value.route.routeStages.findIndex(item => item.step === step);
     documentModel.value.route.routeStages.splice(index, 1);
+    
+    documentModel.value.route.routeStages.forEach((routeStage, index) => {
+        routeStage.step = index + 1;
+    });
   }
 
-  function editRouteStage(id) {
+  function editRouteStage(step) {
     tempRouteStageModel.value = documentModel.value.route.routeStages.find(item => item.id === id);
 
     routeStageModel.value = {
@@ -521,15 +561,9 @@
     if (isEditingRouteStage.value) {
       //const index = documents.value.route.routeStages.findIndex(item => item.id === routeStageModel.value.id);
       //documents.value.route.routeStages[index] = routeStageModel.value;
-    } 
-    else {
+    } else {
       routeStageModel.value.step = documentModel.value.route.routeStages.length + 1;
       documentModel.value.route.routeStages.push(routeStageModel.value);
-      console.log(documentModel.value.route.routeStages[0].name);
-      console.log(documentModel.value.route.routeStages[0].step);
-      console.log(documentModel.value.route.routeStages[0].all_or_one);
-      console.log(documentModel.value.route.routeStages[0].start_date);
-      console.log(documentModel.value.route.routeStages[0].end_date);
     }
 
     // errorMessage.value = "";
@@ -542,15 +576,6 @@
 
 
   function addRouteStageUser() {
-    Promise.all([
-      axios.get('/api/users/plain'),
-      axios.get('/api/departments/'),      
-    ])
-    .then((responses) => {
-      users.value = responses[0].data;
-      departments.value = responses[1].data;
-    });
-
     userDialog.value = true;
   }
 

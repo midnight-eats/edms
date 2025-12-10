@@ -19,8 +19,9 @@ const Document = connection.define("documents", {
       }
     }
   },
-  description: {
-    type: Sequelize.STRING(100),
+  body: {
+    type: Sequelize.TEXT,
+    allowNull: false,
   },
   is_deleted: {
     type: Sequelize.BOOLEAN,
