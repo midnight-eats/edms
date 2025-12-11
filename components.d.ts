@@ -13,11 +13,12 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
     Categories: typeof import('./src/components/Categories.vue')['default']
+    ContractTypes: typeof import('./src/components/ContractTypes.vue')['default']
     Departments: typeof import('./src/components/Departments.vue')['default']
     Documents: typeof import('./src/components/Documents.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     HRDocumentTypes: typeof import('./src/components/HRDocumentTypes.vue')['default']
-    OneFieldForm: typeof import('./src/components/OneFieldForm.vue')['default']
+    MemoTypes: typeof import('./src/components/MemoTypes.vue')['default']
     Positions: typeof import('./src/components/Positions.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

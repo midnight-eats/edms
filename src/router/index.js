@@ -13,6 +13,8 @@ import Positions from '@/components/Positions.vue'
 import Categories from '@/components/Categories.vue'
 import Documents from '@/components/Documents.vue'
 import HRDocumentTypes from '@/components/HRDocumentTypes.vue'
+import MemoTypes from '@/components/MemoTypes.vue'
+import ContractTypes from '@/components/ContractTypes.vue'
 import index from '@/pages/index.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
@@ -23,7 +25,9 @@ const routes = [
   { path: '/positions', component: Positions },
   { path: '/categories', component: Categories },
   { path: '/documents', component: Documents },
-  { path: '/hr-document-types', component: HRDocumentTypes }
+  { path: '/hr-document-types', component: HRDocumentTypes },
+  { path: '/memo-types', component: MemoTypes },
+  { path: '/contract-types', component: ContractTypes }
   //{ path: '/profile', component: ProfileView },
 ];
 
