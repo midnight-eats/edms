@@ -2,7 +2,7 @@ const Connection = require("../connection.js")
 const { Sequelize } = require('sequelize');
 const connection = Connection.getConnection();
 
-const AdministrativeDocumentType = connection.define("administrative_document_types", {
+const DeliveryMethod = connection.define("delivery_methods", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
@@ -14,7 +14,7 @@ const AdministrativeDocumentType = connection.define("administrative_document_ty
     allowNull: false,
     validate: {
       notEmpty: {
-        msg: 'Administrative document type name cannot be empty'
+        msg: 'Delivery method name cannot be empty'
       }
     }
   },
@@ -33,5 +33,5 @@ connection.sync().then(result => {
 .catch(err => console.log(err));
 
 module.exports = {
-  AdministrativeDocumentType
+  DeliveryMethod
 };

@@ -10,8 +10,9 @@
         <v-list-item prepend-icon="mdi-file-document-multiple-outline" title="Типы служебной записки" to="/memo-types"></v-list-item>
         <v-list-item prepend-icon="mdi-file-document-multiple-outline" title="Типы договора" to="/contract-types"></v-list-item>
         <v-list-item prepend-icon="mdi-file-document-multiple-outline" title="Типы ОРД" to="/administrative-document-types"></v-list-item>
-        <v-list-item prepend-icon="mdi-view-dashboard" title="Департаменты и пользователи" to="/departments"></v-list-item>
-        <v-list-item prepend-icon="mdi-account" title="Должности" to="/positions"></v-list-item>
+        <v-list-item prepend-icon="mdi-truck-fast" title="Способы доставки" to="/delivery-methods"></v-list-item>
+        <v-list-item prepend-icon="mdi-account-group" title="Департаменты и пользователи" to="/departments"></v-list-item>
+        <v-list-item prepend-icon="mdi-badge-account-outline" title="Должности" to="/positions"></v-list-item>
         <v-list-item prepend-icon="mdi-account" title="Категории" to="/categories"></v-list-item>
       </v-list>
     </v-navigation-drawer>

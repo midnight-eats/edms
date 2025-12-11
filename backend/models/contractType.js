@@ -14,7 +14,7 @@ const ContractType = connection.define("contract_types", {
     allowNull: false,
     validate: {
       notEmpty: {
-        msg: 'Memo type name cannot be empty'
+        msg: 'Contract type name cannot be empty'
       }
     }
   },

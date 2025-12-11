@@ -12,6 +12,7 @@ const { hrDocumentTypeRouter } = require("./routers/hrDocumentTypeRouter.js");
 const { memoTypeRouter } = require("./routers/memoTypeRouter.js");
 const { contractTypeRouter } = require("./routers/contractTypeRouter.js");
 const { administrativeDocumentTypeRouter } = require("./routers/administrativeDocumentTypeRouter.js");
+const { deliveryMethodRouter } = require("./routers/deliveryMethodRouter.js");
 
 app.use("/api/positions/", positionRouter);
 app.use("/api/categories/", categoryRouter);
@@ -22,6 +23,7 @@ app.use("/api/memo-types/", memoTypeRouter);
 app.use("/api/hr-document-types/", hrDocumentTypeRouter);
 app.use("/api/contract-types/", contractTypeRouter);
 app.use("/api/administrative-document-types/", administrativeDocumentTypeRouter);
+app.use("/api/delivery-methods/", deliveryMethodRouter);
    
 app.use("/about", function (request, response) {
     response.send("О сайте");
