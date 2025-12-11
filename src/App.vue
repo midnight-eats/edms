@@ -9,6 +9,7 @@
         <v-list-item prepend-icon="mdi-file-document-multiple-outline" title="Виды кадрового документа" to="/hr-document-types"></v-list-item>
         <v-list-item prepend-icon="mdi-file-document-multiple-outline" title="Типы служебной записки" to="/memo-types"></v-list-item>
         <v-list-item prepend-icon="mdi-file-document-multiple-outline" title="Типы договора" to="/contract-types"></v-list-item>
+        <v-list-item prepend-icon="mdi-file-document-multiple-outline" title="Типы ОРД" to="/administrative-document-types"></v-list-item>
         <v-list-item prepend-icon="mdi-view-dashboard" title="Департаменты и пользователи" to="/departments"></v-list-item>
         <v-list-item prepend-icon="mdi-account" title="Должности" to="/positions"></v-list-item>
         <v-list-item prepend-icon="mdi-account" title="Категории" to="/categories"></v-list-item>
