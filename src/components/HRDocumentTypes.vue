@@ -14,7 +14,7 @@
           icon="mdi-book-multiple" 
           size="x-small" start>
         </v-icon>
-        Должности
+        Виды кадрового документа
       </v-toolbar-title>
 
       <v-btn
@@ -47,7 +47,7 @@
   </v-sheet>
 
   <v-dialog v-model="dialog" max-width="500">
-    <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} должности`">
+    <v-card :title="`${isEditing ? 'Изменение' : 'Добавление'} вида кадрового документа`">
       <template v-slot:text>
         <v-row>
           <v-col v-if="errorMessage" cols="12">
@@ -100,7 +100,7 @@
 
   function loadData() {
     Promise.all([
-      axios.get('/api/positions/')
+      axios.get('/api/hr-document-types/')
     ])
     .then((responses) => {
       items.value = responses[0].data;
@@ -113,7 +113,7 @@
   }
 
   function removeItem(id) {
-    Promise.all([axios.post(`/api/positions/delete/${id}`)])
+    Promise.all([axios.post(`/api/hr-document-types/delete/${id}`)])
     .then((responses) => {
       const index = items.value.findIndex(item => item.id === id);
       items.value.splice(index, 1);
@@ -153,7 +153,7 @@
         return;
       }
 
-      Promise.all([axios.post("/api/positions/update", formModel.value)])
+      Promise.all([axios.post("/api/hr-document-types/update", formModel.value)])
       .then((responses) => {           
         const index = items.value.findIndex(item => item.id === formModel.value.id);
         items.value[index] = formModel.value;
@@ -165,11 +165,11 @@
         return;
       }
 
-      Promise.all([axios.post("/api/positions/create", formModel.value)])
+      Promise.all([axios.post("/api/hr-document-types/create", formModel.value)])
       .then((responses) => { 
-        var serverPosition = responses[0].data;
-        console.log(serverPosition);     
-        items.value.push(serverPosition);
+        var serverHRDocumentType = responses[0].data;
+        console.log(serverHRDocumentType);     
+        items.value.push(serverHRDocumentType);
       });
     }
 

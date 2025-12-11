@@ -5,7 +5,7 @@
     :items="documents"
     :hide-default-footer="documents.length < 20"
   >
-    <template v-slot:item.start_date="{ item }">
+    <template v-slot:item.created_at="{ item }">
       {{ item.created_at.toLocaleDateString('ru-RU') }}
     </template>
 

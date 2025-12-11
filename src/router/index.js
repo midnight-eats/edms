@@ -12,6 +12,7 @@ import Departments from '@/components/Departments.vue'
 import Positions from '@/components/Positions.vue'
 import Categories from '@/components/Categories.vue'
 import Documents from '@/components/Documents.vue'
+import HRDocumentTypes from '@/components/HRDocumentTypes.vue'
 import index from '@/pages/index.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
@@ -22,6 +23,7 @@ const routes = [
   { path: '/positions', component: Positions },
   { path: '/categories', component: Categories },
   { path: '/documents', component: Documents },
+  { path: '/hr-document-types', component: HRDocumentTypes }
   //{ path: '/profile', component: ProfileView },
 ];
 
