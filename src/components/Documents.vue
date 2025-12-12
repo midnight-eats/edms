@@ -563,9 +563,10 @@
   }
 
   function editRouteStage(step) {
-    tempRouteStageModel.value = documentModel.value.route.routeStages.find(item => item.step === step);
+    tempRouteStageModel.value = documentModel.value.route.routeStages
+                                .find(item => item.step === step);
 
-    routeStageModel.value = {
+    routeStageModel.value = cloneDeep({
       id: tempRouteStageModel.value.id,
       name: tempRouteStageModel.value.name,
       step: tempRouteStageModel.value.step,
@@ -573,17 +574,17 @@
       duration: tempRouteStageModel.value.duration,
       start_date: tempRouteStageModel.value.start_date,
       routeStageUsers: tempRouteStageModel.value.routeStageUsers
-    };
+    });
 
-    isEditingRouteStage = true;
+    isEditingRouteStage.value = true;
     routeStageDialog.value = true;
   }
 
   async function saveRouteStage() {  
     if (isEditingRouteStage.value) {
-      //const index = documents.value.route.routeStages.findIndex(item => item.id === routeStageModel.value.id);
-      //documents.value.route.routeStages[index] = routeStageModel.value;
-      isEditingRouteStage = false;
+      const index = documentModel.value.route.routeStages.findIndex(item => item.id === routeStageModel.value.id);
+      documentModel.value.route.routeStages[index] = routeStageModel.value;
+      isEditingRouteStage.value = false;
     } else {
       routeStageModel.value.step = documentModel.value.route.routeStages.length + 1;
       documentModel.value.route.routeStages.push(routeStageModel.value);

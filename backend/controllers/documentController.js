@@ -170,8 +170,6 @@ async function documentPostUpdate(request, response) {
       transaction: transaction 
     });
 
-    console.log(updatedRoute.name);
-
     await Route.update({
       name: updatedRoute.name,
       documentId: updatedDocument.id
@@ -182,6 +180,9 @@ async function documentPostUpdate(request, response) {
 
     for (const updatedRouteStage of updatedRouteStages) {
       if (updatedRouteStage.id !== 0) {
+        const originalRouteStage = originalRouteStages
+                                  .find(item => item.id === updatedRouteStage.id);
+
         await RouteStage.update({
           name: updatedRouteStage.name,
           step: updatedRouteStage.step,
@@ -212,6 +213,22 @@ async function documentPostUpdate(request, response) {
               });
           }
         }
+
+        for (const originalRouteStageUser of originalRouteStage.routeStageUsers) {
+          const found = updatedRouteStage.routeStageUsers
+                                          .find(item => item.id === originalRouteStageUser.id);
+
+          if (!found) {
+            await RouteStageUser.update({
+              is_deleted: true
+            }, {
+              where: {
+                id: originalRouteStageUser.id,
+            },
+              transaction: transaction
+            });
+          }
+        }
       } else {
           const createdRouteStage = await RouteStage.create({
             name: updatedRouteStage.name,
@@ -229,7 +246,7 @@ async function documentPostUpdate(request, response) {
               userId: updatedRouteStageUser.userId,
               routeStageId: createdRouteStage.id
             }, { 
-            transaction: transaction 
+              transaction: transaction 
             });
           }
       }
@@ -240,8 +257,6 @@ async function documentPostUpdate(request, response) {
                     .find(item => Number(item.id) === Number(originalRouteStage.id));
 
       if (!found) {
-        console.log(originalRouteStage.id);
-        console.log('yay 2x');
         await RouteStage.update({
           is_deleted: true
           }, {
