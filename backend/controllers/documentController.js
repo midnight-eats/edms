@@ -17,19 +17,75 @@ async function documentGet(request, response) {
 }
 
 async function documentPostDelete(request, response) {
-  var id = request.params["id"];
+  const document = request.body;
 
-  Document.update({ 
-    is_deleted: true
-  }, {
-    where: {
-      id: id
+  const route = await Route.findOne({
+      where: {
+        documentId: document.id,
+        is_deleted: false
+      },
+      include: [{
+          model: RouteStage,
+          as: 'routeStages',
+          where: { is_deleted: false },
+          required: false,
+          include: [{
+              model: RouteStageUser,
+              as: 'routeStageUsers',
+              where: { is_deleted: false },
+              required: false,
+          }]
+      }]
+    })
+
+  const routeStages = route.routeStages;
+
+  const sequelize = Document.sequelize;
+  const transaction = await sequelize.transaction();
+
+  try {
+    const deletedDocument = await Document.update({ 
+      is_deleted: true
+    }, {
+      where: {
+        id: document.id
+      }
+    });
+
+    await Route.update({ 
+      is_deleted: true
+    }, {
+      where: {
+        documentId: document.id
+      }
+    });
+
+    for (const routeStage of routeStages) {
+      await RouteStage.update({ 
+        is_deleted: true
+      }, {
+        where: {
+          routeId: route.id
+        }
+      });
+
+      for (const routeStageUser of routeStage.routeStageUsers) {
+        await RouteStageUser.update({ 
+          is_deleted: true
+        }, {
+          where: {
+            routeStageId: routeStage.id
+          }
+        });        
+      }
     }
-  })
-  .then((res) => {
-    response.json(res);
-  })
-  .catch(err => console.log(err));
+
+    await transaction.commit();
+
+    response.json(deletedDocument);
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 async function documentPostCreate(request, response) {

@@ -42,7 +42,7 @@
           color="medium-emphasis" 
           icon="mdi-delete" 
           size="small" 
-          @click="removeDocument(item.id)">
+          @click="removeDocument(item)">
         </v-icon>
       </div>
     </template>  
@@ -457,10 +457,10 @@
     documentDialog.value = true;
   }
 
-  function removeDocument(id) {
-    Promise.all([axios.post(`/api/documents/delete/${id}`)])
+  function removeDocument(item) {
+    Promise.all([axios.post(`/api/documents/delete`, item)])
     .then((responses) => {
-      const index = documents.value.findIndex(item => item.id === id);
+      const index = documents.value.findIndex(doc => doc.id === item.id);
       documents.value.splice(index, 1);
     });
   }

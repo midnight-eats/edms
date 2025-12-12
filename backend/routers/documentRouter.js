@@ -7,7 +7,7 @@ const { documentGet,
 const documentRouter = express.Router();
 
 documentRouter.get("/", documentGet);
-//documentRouter.post("/delete/:id", documentPostDelete);
+documentRouter.post("/delete", documentPostDelete);
 documentRouter.post("/create", documentPostCreate);
 documentRouter.post("/update", documentPostUpdate);
 
