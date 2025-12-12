@@ -45,6 +45,7 @@ async function documentPostCreate(request, response) {
 
     const createdDocument = await Document.create({
       name: document.name,
+      description: document.description,
       body: document.body
     }, { 
       transaction: transaction 
@@ -71,7 +72,7 @@ async function documentPostCreate(request, response) {
 
       for (const routeStageUser of routeStage.routeStageUsers) {
         await RouteStageUser.create({
-          userId: routeStageUser.id,
+          userId: routeStageUser.userId,
           routeStageId: createdRouteStage.id
         }, { 
         transaction: transaction 
@@ -94,7 +95,8 @@ async function documentPostUpdate(request, response) {
   console.log(`Update ${document}`)
   Document.update({ 
     name: document.name,
-    description: document.description
+    description: document.description,
+    body: document.body
   }, {
     where: {
       id: document.id

@@ -1,8 +1,8 @@
 const Connection = require("../connection.js")
 const { Sequelize } = require('sequelize');
 const connection = Connection.getConnection();
-const { RouteStage } = require("./routeStage.js");
 const { User } = require("./user.js");
+const { RouteStage } = require("./routeStage.js");
 
 const RouteStageUser = connection.define("route_stage_users", {
   id: {
@@ -23,9 +23,6 @@ const RouteStageUser = connection.define("route_stage_users", {
   }}, {
     timestamps: false
 });
-
-RouteStageUser.belongsTo(RouteStage);
-RouteStageUser.belongsTo(User);
 
 connection.sync({force: false, alter: true}).then(result => {
   console.log(result);

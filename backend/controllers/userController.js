@@ -21,7 +21,6 @@ async function userGetPlain(request, response) {
       Position,
       Department
     ],
-    raw : true,
     where: {
       is_deleted: false
     }

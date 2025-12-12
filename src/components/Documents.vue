@@ -67,7 +67,14 @@
               <v-text-field 
                 v-model="documentModel.name"
                 label="Название"
-                required
+              ></v-text-field>
+            </v-col>
+          </v-row>          
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                v-model="documentModel.description"
+                label="Описание"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -77,7 +84,6 @@
                 v-model="documentModel.body"
                 label="Содержимое"
                 auto-grow
-                required
               ></v-textarea>
             </v-col>
           </v-row>
@@ -201,13 +207,6 @@
             :headers="routeStageUserHeaders"
             :items="routeStageModel.routeStageUsers"
           >
-          <template v-slot:item.positionId="{ item }">
-            {{ getPositionName(item.positionId) }}
-          </template>
-          <template v-slot:item.departmentId="{ item }">
-            {{ getDepartmentName(item.departmentId) }}
-          </template>
-
             <template v-slot:top>
               <v-toolbar flat>
                 <v-toolbar-title class="text-subtitle-1 font-weight-medium">
@@ -347,33 +346,32 @@
   import { computed, ref, shallowRef, toRef } from 'vue';
   import axios from 'axios';
   import { VDateInput } from 'vuetify/labs/VDateInput'
-  import { useLocale } from 'vuetify'
 
   const headers = [
     { title: 'ID', align: 'start', key: 'id' },
     { title: 'Название', align: 'start', key: 'name' },
-    { title: 'Описание', align: 'start', key: 'body' },
+    { title: 'Описание', align: 'start', key: 'description' },
     { title: 'Дата создания', align: 'start', key: 'created_at' },
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
 
   const routeStageHeaders = [
-    { title: 'Название', align: 'start', key: 'name' },
-    { title: 'Порядковый номер', align: 'start', key: 'step' },
-    { title: 'Условие перехода на след. этап', align: 'start', key: 'all_or_one' },
-    { title: 'Дата начала', align: 'start', key: 'start_date' },
-    { title: 'Длительность', align: 'start', key: 'duration' },
-    { title: 'Участники', align: 'start', key: 'routeStageUsers' },
+    { title: 'Название', align: 'start', key: 'name', sortable: false },
+    { title: 'Порядковый номер', align: 'start', key: 'step', sortable: false },
+    { title: 'Условие перехода на след. этап', align: 'start', key: 'all_or_one', sortable: false },
+    { title: 'Дата начала', align: 'start', key: 'start_date', sortable: false },
+    { title: 'Длительность', align: 'start', key: 'duration', sortable: false },
+    { title: 'Участники', align: 'start', key: 'routeStageUsers', sortable: false },
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
 
   const routeStageUserHeaders = [
-    { title: 'Имя', align: 'start', key: 'name' },
-    { title: 'Логин', align: 'start', key: 'username' },
-    { title: 'Эл. почта', align: 'start', key: 'email' },
-    { title: 'Роль', align: 'start', key: 'role' },
-    { title: 'Должность', align: 'start', key: 'position.name' },
-    { title: 'Подразделение', align: 'start', key: 'department.name' },
+    { title: 'Имя', align: 'start', key: 'user.name' },
+    { title: 'Логин', align: 'start', key: 'user.username' },
+    { title: 'Эл. почта', align: 'start', key: 'user.email' },
+    { title: 'Роль', align: 'start', key: 'user.role' },
+    { title: 'Должность', align: 'start', key: 'user.position.name' },
+    { title: 'Подразделение', align: 'start', key: 'user.department.name' },
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
 
@@ -421,6 +419,7 @@
     return {
       id: 0,
       name: '',
+      description: '',
       body: '',
       created_at: new Date(),
       route: {
@@ -446,7 +445,7 @@
   function addDocument() {
     Promise.all([
       axios.get('/api/users/plain'),
-      axios.get('/api/departments/'),      
+      axios.get('/api/departments/'),
     ])
     .then((responses) => {
       users.value = responses[0].data;
@@ -466,17 +465,32 @@
   }
 
   function editDocument(id) {
-    tempDocumentModel.value = documents.value.find(item => item.id === id);
+    Promise.all([
+      axios.get('/api/users/plain'),
+      axios.get('/api/departments/'),
+      axios.get(`/api/routes/${id}`)
+    ])
+    .then((responses) => {
+      users.value = responses[0].data;
+      departments.value = responses[1].data;
 
-    documentModel.value = {
-      id: tempDocumentModel.value.id,
-      name: tempDocumentModel.value.name,
-      body: tempDocumentModel.value.body,
-      created_at: tempDocumentModel.value.created_at,
-      route: tempDocumentModel.value.route
-    };
+      tempDocumentModel.value = documents.value.find(item => item.id === id);
+      tempDocumentModel.value.route = responses[2].data;
 
-    documentDialog.value = true;
+      for (const routeStage of tempDocumentModel.value.route.routeStages)
+        routeStage.start_date = new Date(routeStage.start_date);
+
+      documentModel.value = {
+        id: tempDocumentModel.value.id,
+        name: tempDocumentModel.value.name,
+        description: tempDocumentModel.value.description,
+        body: tempDocumentModel.value.body,
+        created_at: tempDocumentModel.value.created_at,
+        route: tempDocumentModel.value.route
+      };
+
+      documentDialog.value = true;
+    });
   }
 
   async function saveDocument() {
@@ -510,9 +524,9 @@
     let len = routeStageUsers.length;
 
     for (let i = 0; i < len; i++) {
-      mergedList += routeStageUsers[i]['position.name'] +
+      mergedList += routeStageUsers[i].user.position.name +
                     ' ' +
-                    routeStageUsers[i].name;
+                    routeStageUsers[i].user.name;
 
       if (i < len - 1)
         mergedList += ', ';
@@ -526,9 +540,10 @@
     const len = documentModel.value.route.routeStages.length;
 
     if (len > 0)
-      routeStageModel.value.start_date.setDate(routeStageModel.value.start_date.getDate() + 
-                                        documentModel.value.route.routeStages[len - 1].step);
-    
+      routeStageModel.value.start_date.setDate(
+        documentModel.value.route.routeStages[len - 1].start_date.getDate() + 
+        documentModel.value.route.routeStages[len - 1].duration);
+
     routeStageDialog.value = true;
   }
 
@@ -542,7 +557,7 @@
   }
 
   function editRouteStage(step) {
-    tempRouteStageModel.value = documentModel.value.route.routeStages.find(item => item.id === id);
+    tempRouteStageModel.value = documentModel.value.route.routeStages.find(item => item.step === step);
 
     routeStageModel.value = {
       id: tempRouteStageModel.value.id,
@@ -585,8 +600,13 @@
   }
 
   async function saveRouteStageUser(user) {
-    // errorMessage.value = "";
-    routeStageModel.value.routeStageUsers.push(user);
+    routeStageModel.value.routeStageUsers.push({
+      id: 0,
+      routeStageId: routeStageModel.value.id,
+      userId: user.id,
+      user: user
+    });
+
     userDialog.value = false;
   }
 

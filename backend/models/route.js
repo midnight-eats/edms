@@ -2,7 +2,6 @@ const Connection = require("../connection.js")
 const { Sequelize } = require('sequelize');
 const connection = Connection.getConnection();
 const { Document } = require("./document.js");
-const { RouteStage } = require("./routeStage.js");
 
 const Route = connection.define("routes", {
   id: {
@@ -30,7 +29,6 @@ const Route = connection.define("routes", {
 });
 
 Route.belongsTo(Document);
-Route.hasMany(RouteStage);
 
 connection.sync({force: false, alter: true}).then(result => {
   console.log(result);

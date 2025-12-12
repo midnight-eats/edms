@@ -1,5 +1,6 @@
 const Connection = require("../connection.js")
 const { Sequelize } = require('sequelize');
+const { Route } = require("./route.js");
 const connection = Connection.getConnection();
 
 const RouteStage = connection.define("route_stages", {
@@ -12,7 +13,6 @@ const RouteStage = connection.define("route_stages", {
   name: {
     type: Sequelize.STRING(100),
     allowNull: false,
-    unique: true,
     validate: {
       notEmpty: {
         msg: 'Name cannot be empty'

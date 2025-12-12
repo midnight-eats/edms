@@ -12,10 +12,18 @@ const Document = connection.define("documents", {
   name: {
     type: Sequelize.STRING(100),
     allowNull: false,
-    unique: true,
     validate: {
       notEmpty: {
         msg: 'Name cannot be empty'
+      }
+    }
+  },
+  description: {
+    type: Sequelize.STRING(200),
+    allowNull: false,
+    validate: {
+      notEmpty: {
+        msg: 'Description cannot be empty'
       }
     }
   },
