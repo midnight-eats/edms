@@ -345,7 +345,8 @@
 <script setup>
   import { computed, ref, shallowRef, toRef } from 'vue';
   import axios from 'axios';
-  import { VDateInput } from 'vuetify/labs/VDateInput'
+  import { VDateInput } from 'vuetify/labs/VDateInput';
+  import { cloneDeep } from 'lodash';
 
   const headers = [
     { title: 'ID', align: 'start', key: 'id' },
@@ -394,7 +395,7 @@
   const routeStageDialog = shallowRef(false);
   const userDialog = shallowRef(false);
   const isEditingDocument = toRef(() => !!documentModel.value.id);
-  const isEditingRouteStage = toRef(() => !!routeStageModel.value.id);
+  const isEditingRouteStage = ref(false);
   const errorMessage = ref("");
   const selectedDepartment = ref([]);
   const departments = ref([]);
@@ -480,14 +481,14 @@
       for (const routeStage of tempDocumentModel.value.route.routeStages)
         routeStage.start_date = new Date(routeStage.start_date);
 
-      documentModel.value = {
+      documentModel.value = cloneDeep({
         id: tempDocumentModel.value.id,
         name: tempDocumentModel.value.name,
         description: tempDocumentModel.value.description,
         body: tempDocumentModel.value.body,
         created_at: tempDocumentModel.value.created_at,
         route: tempDocumentModel.value.route
-      };
+      });
 
       documentDialog.value = true;
     });
@@ -495,7 +496,12 @@
 
   async function saveDocument() {
     if (isEditingDocument.value) {
-      Promise.all([axios.post("/api/documents/update", documentModel.value)])
+      const data = {
+        original: tempDocumentModel.value,
+        updated: documentModel.value
+      };
+
+      Promise.all([axios.post("/api/documents/update", data)])
       .then((responses) => {           
         const index = documents.value.findIndex(item => item.id === documentModel.value.id);
         documents.value[index] = documentModel.value;
@@ -569,6 +575,7 @@
       routeStageUsers: tempRouteStageModel.value.routeStageUsers
     };
 
+    isEditingRouteStage = true;
     routeStageDialog.value = true;
   }
 
@@ -576,12 +583,12 @@
     if (isEditingRouteStage.value) {
       //const index = documents.value.route.routeStages.findIndex(item => item.id === routeStageModel.value.id);
       //documents.value.route.routeStages[index] = routeStageModel.value;
+      isEditingRouteStage = false;
     } else {
       routeStageModel.value.step = documentModel.value.route.routeStages.length + 1;
       documentModel.value.route.routeStages.push(routeStageModel.value);
     }
 
-    // errorMessage.value = "";
     routeStageDialog.value = false;
   }
 

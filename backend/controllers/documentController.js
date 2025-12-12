@@ -91,20 +91,131 @@ async function documentPostCreate(request, response) {
 }
 
 async function documentPostUpdate(request, response) {
-  var document = request.body;
-  console.log(`Update ${document}`)
-  Document.update({ 
-    name: document.name,
-    description: document.description,
-    body: document.body
-  }, {
-    where: {
-      id: document.id
+  const { original, updated } = request.body;
+
+  const originalRouteStages = original.route.routeStages;
+
+  const updatedDocument = updated;
+  const updatedRoute = updated.route;
+  const updatedRouteStages = updated.route.routeStages;
+
+  const sequelize = Document.sequelize;
+  const transaction = await sequelize.transaction();
+
+  try {
+    console.log(`Update ${original}`);
+
+    const updatedDocumentRes = await Document.update({
+      name: updatedDocument.name,
+      description: updatedDocument.description,
+      body: updatedDocument.body, 
+    }, {
+      where: { id: updatedDocument.id },
+      transaction: transaction 
+    });
+
+    console.log(updatedRoute.name);
+
+    await Route.update({
+      name: updatedRoute.name,
+      documentId: updatedDocument.id
+    }, { 
+      where: { id: updatedRoute.id },
+      transaction: transaction 
+    });
+
+    for (const updatedRouteStage of updatedRouteStages) {
+      if (updatedRouteStage.id !== 0) {
+        await RouteStage.update({
+          name: updatedRouteStage.name,
+          step: updatedRouteStage.step,
+          all_or_one: updatedRouteStage.all_or_one,
+          duration: updatedRouteStage.duration,
+          start_date: updatedRouteStage.start_date,
+          routeId: updatedRoute.id
+        }, { 
+          where: { id: updatedRouteStage.id },
+          transaction: transaction 
+        });
+
+        for (const updatedRouteStageUser of updatedRouteStage.routeStageUsers) {
+          if (updatedRouteStageUser.id !== 0) {
+            await RouteStageUser.update({
+              userId: updatedRouteStageUser.userId,
+              routeStageId: updatedRouteStage.id
+            }, { 
+              where: { id: updatedRouteStageUser.id },
+              transaction: transaction 
+            });
+          } else {
+              await RouteStageUser.create({
+                userId: updatedRouteStageUser.userId,
+                routeStageId: updatedRouteStage.id
+              }, { 
+                transaction: transaction 
+              });
+          }
+        }
+      } else {
+          const createdRouteStage = await RouteStage.create({
+            name: updatedRouteStage.name,
+            step: updatedRouteStage.step,
+            all_or_one: updatedRouteStage.all_or_one,
+            duration: updatedRouteStage.duration,
+            start_date: updatedRouteStage.start_date,
+            routeId: updatedRoute.id
+          }, { 
+            transaction: transaction 
+          });
+
+          for (const updatedRouteStageUser of updatedRouteStage.routeStageUsers) {
+            await RouteStageUser.create({
+              userId: updatedRouteStageUser.userId,
+              routeStageId: createdRouteStage.id
+            }, { 
+            transaction: transaction 
+            });
+          }
+      }
     }
-  })
-  .then((res) =>  {
-    response.json(res);
-  });
+
+    for (const originalRouteStage of originalRouteStages) {
+      const found = updatedRouteStages
+                    .find(item => Number(item.id) === Number(originalRouteStage.id));
+
+      if (!found) {
+        console.log(originalRouteStage.id);
+        console.log('yay 2x');
+        await RouteStage.update({
+          is_deleted: true
+          }, {
+          where: {
+            id: originalRouteStage.id,
+          },
+          transaction: transaction
+        });
+
+        for (const originalRouteStageUser of originalRouteStage.routeStageUsers) {
+          await RouteStageUser.update({
+            is_deleted: true,
+            }, {
+            where: {
+              id: originalRouteStageUser.id,
+            },
+            transaction: transaction
+          });
+        }
+      }
+    }
+
+    await transaction.commit();
+
+    response.json(updatedDocumentRes);
+  } catch (err) {
+    await transaction.rollback();
+
+    console.log(err);
+  }
 }
 
 module.exports = { 
