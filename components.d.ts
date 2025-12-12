@@ -21,6 +21,7 @@ declare module 'vue' {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     HRDocumentTypes: typeof import('./src/components/HRDocumentTypes.vue')['default']
     MemoTypes: typeof import('./src/components/MemoTypes.vue')['default']
+    OneFieldDataTable: typeof import('./src/components/OneFieldDataTable.vue')['default']
     Positions: typeof import('./src/components/Positions.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
