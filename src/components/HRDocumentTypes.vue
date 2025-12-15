@@ -1,7 +1,7 @@
 <template>
   <OneFieldDataTable
-    title="Виды кадрового документа"
-    dialog-title="вида кадрового документа"
+    title="Типы кадрового документа"
+    dialog-title="типа кадрового документа"
     api-endpoint="/api/hr-document-types"
   />
 </template>

@@ -20,22 +20,22 @@ async function routeGet(request, response) {
       is_deleted: false
     },
     include: [{
-        model: RouteStage,
-        as: 'routeStages',
-        where: { is_deleted: false },
-        required: false,
-        include: [{
-            model: RouteStageUser,
-            as: 'routeStageUsers',
-            where: { is_deleted: false },
-            required: false,
-            include: [{
-                model: User,
-                include: [
-                  Position, Department
-                ]
-            }]
-        }]
+      model: RouteStage,
+      as: 'routeStages',
+      where: { is_deleted: false },
+      required: false,
+      include: [{
+          model: RouteStageUser,
+          as: 'routeStageUsers',
+          where: { is_deleted: false },
+          required: false,
+          include: [{
+              model: User,
+              include: [
+                Position, Department
+              ]
+          }]
+      }]
     }]
   })
   .then((res) => {

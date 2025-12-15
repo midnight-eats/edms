@@ -1,63 +1,43 @@
 const Connection = require("../connection.js")
 const { Sequelize } = require('sequelize');
+const { MemoType } = require("./memoType.js");
 const { User } = require("./user.js");
+const { Document } = require("./document.js");
 const connection = Connection.getConnection();
 
-const Document = connection.define("documents", {
+const Memo = connection.define("memos", {
   id: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     primaryKey: true,
     allowNull: false
   },
-  number: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    defaultValue: '0',
-    validate: {
-      notEmpty: {
-        msg: 'Number cannot be empty'
-      }
-    }
-  },
   subject: {
     type: Sequelize.STRING,
     allowNull: false,
-    defaultValue: '1',
     validate: {
       notEmpty: {
         msg: 'Subject cannot be empty'
       }
     }
   },
-  body: {
+  description: {
     type: Sequelize.TEXT,
     allowNull: false,
-    defaultValue: '1',
     validate: {
       notEmpty: {
-        msg: 'Body cannot be empty'
+        msg: 'Description cannot be empty'
       }
     }
-  },
-  duration: {
-    type: Sequelize.SMALLINT,
-    allowNull: false,
-  },
-  is_deleted: {
-    type: Sequelize.BOOLEAN,
-    allowNull: false,
-    defaultValue: false
-  },
-  created_at: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW,
   }}, {
     timestamps: false
   }
 );
 
-Document.belongsTo(User, { as: 'author' });
+Memo.belongsTo(Document);
+Memo.belongsTo(User, { as: 'author_manager' });
+Memo.belongsTo(User, { as: 'signatory' });
+Memo.belongsTo(MemoType);
 
 connection.sync({force: false, alter: true}).then(result => {
   console.log(result);
@@ -65,5 +45,5 @@ connection.sync({force: false, alter: true}).then(result => {
 .catch(err => console.log(err));
 
 module.exports = {
-  Document
+  Memo
 };

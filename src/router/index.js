@@ -13,6 +13,7 @@ import Positions from '@/components/Positions.vue'
 import Categories from '@/components/Categories.vue'
 import Documents from '@/components/Documents.vue'
 import HRDocumentTypes from '@/components/HRDocumentTypes.vue'
+import HRDocuments from '@/components/HRDocuments.vue'
 import MemoTypes from '@/components/MemoTypes.vue'
 import ContractTypes from '@/components/ContractTypes.vue'
 import AdministrativeDocumentTypes from '@/components/AdministrativeDocumentTypes.vue'
@@ -28,6 +29,7 @@ const routes = [
   { path: '/categories', component: Categories },
   { path: '/documents', component: Documents },
   { path: '/hr-document-types', component: HRDocumentTypes },
+  { path: '/hr-documents', component: HRDocuments },
   { path: '/memo-types', component: MemoTypes },
   { path: '/contract-types', component: ContractTypes },
   { path: '/administrative-document-types', component: AdministrativeDocumentTypes },

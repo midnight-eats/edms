@@ -5,8 +5,12 @@
     :items="documents"
     :hide-default-footer="documents.length < 20"
   >
-    <template v-slot:item.created_at="{ item }">
-      {{ item.created_at.toLocaleDateString('ru-RU') }}
+    <template v-slot:item.document.created_at="{ item }">
+      {{ item.document.created_at.toLocaleDateString('ru-RU') }}
+    </template>
+
+    <template v-slot:item.document.author="{ item }">
+      {{ formatUser(item.document.author) }}
     </template>
 
     <template v-slot:top>
@@ -17,7 +21,7 @@
             icon="mdi-book-multiple" 
             size="x-small" start>
           </v-icon>
-          Документы
+          Кадровые документы
         </v-toolbar-title>
 
         <v-btn
@@ -36,7 +40,7 @@
           color="medium-emphasis" 
           icon="mdi-pencil" 
           size="small" 
-          @click="editDocument(item.id)">
+          @click="editDocument(item)">
         </v-icon>
         <v-icon 
           color="medium-emphasis" 
@@ -59,16 +63,98 @@
     </v-tabs>
     </container>
 
-    <v-tabs-window class="pr-6 pl-6" v-model="tab">
-      <v-tabs-window-item  value="document">
+    <v-tabs-window class="pr-6 pl-6" style="overflow-y: auto;" v-model="tab">
+      <v-tabs-window-item value="document">
         <container>
           <v-row>
             <v-col cols="12">
+              <v-select
+                label="Автор"
+                :items="users"
+                item-title="name"
+                item-value="id"
+                v-model="documentModel.document.authorId"
+              >
+                <template v-slot:item="{ props: itemProps, item }">
+                  <v-list-item v-bind="itemProps" :subtitle="item.raw.position.name"></v-list-item>
+                </template>
+              </v-select>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-select
+                label="Тип документа"
+                :items="documentTypes"
+                item-title="name"
+                item-value="id"
+                v-model="documentModel.hrDocumentTypeId"
+              ></v-select>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field 
+                v-model="documentModel.document.subject"
+                label="Тема"
+                required
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
               <v-textarea
-                v-model="documentModel.body"
-                label="Содержимое"
+                v-model="documentModel.document.body"
+                label="Содержание"
                 auto-grow
               ></v-textarea>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-number-input
+                v-model="documentModel.document.duration"
+                :reverse="false"
+                controlVariant="default"
+                label="Длительность"
+                :hideInput="false"
+                :inset="false"
+                :min="1"
+              ></v-number-input>
+            </v-col>
+          </v-row>
+          <!-- other fields for different types of document -->
+          <v-row>
+            <v-col cols="12">
+              <v-text-field 
+                v-model="documentModel.employee_name"
+                label="ФИО сотрудника"
+                required
+              ></v-text-field>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-select
+                label="Должность"
+                :items="positions"
+                item-title="name"
+                item-value="id"
+                v-model="documentModel.positionId"
+              ></v-select>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-autocomplete
+                label="Подразделение"
+                :items="departments"
+                item-title="name"
+                item-value="id"
+                v-model="documentModel.department"
+                readonly
+                @click="departmentDialog=true"
+              ></v-autocomplete>
             </v-col>
           </v-row>
         </container>
@@ -78,7 +164,7 @@
           <v-row>
             <v-col cols="12">
               <v-text-field 
-                v-model="documentModel.route.name"
+                v-model="documentModel.document.route.name"
                 label="Название"
                 required
               ></v-text-field>
@@ -87,14 +173,14 @@
           <v-row class="pa-3">
             <v-data-table-virtual
               :headers="routeStageHeaders"
-              :items="documentModel.route.routeStages"
+              :items="documentModel.document.route.routeStages"
               cols="12"
             >
               <template v-slot:item.all_or_one="{ item }">
                 {{ item.all_or_one ? "Согласие всех участников" : "Согласие одного участника" }}
               </template>
               <template v-slot:item.routeStageUsers="{ item }">
-                {{ formatRouteStageUsers(item.routeStageUsers) }}
+                {{ formatUsers(item.routeStageUsers) }}
               </template>
               <template v-slot:item.start_date="{ item }">
                 {{ item.start_date.toLocaleDateString('ru-RU') }}
@@ -180,7 +266,7 @@
           </v-col>
           <v-col cols="8">
             <v-date-input
-            v-if="!documentModel.route.routeStages.length > 0"
+            v-if="!documentModel.document.route.routeStages.length > 0"
             v-model="routeStageModel.start_date"
             label="Дата начала"
             ></v-date-input>
@@ -324,19 +410,56 @@
     </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-dialog v-model="departmentDialog" max-width="1000">
+    <v-card :title="`Добавление подразделения`">
+      <v-container fluid class="fill-height pa-0">
+        <v-row dense>
+          <v-col cols="12">
+            <v-treeview
+              :items="departments"
+              item-title="name"
+              item-value="id"
+              item-key="id"
+              density="compact"
+              rounded
+            >
+              <template v-slot:append="{ item }">
+                <div class="d-flex ga-2 justify-end">
+                  <v-icon 
+                    color="medium-emphasis" 
+                    icon="mdi-plus" 
+                    size="small" 
+                    @click="saveDepartment(item)">
+                  </v-icon>
+                </div>
+              </template>
+            </v-treeview>
+          </v-col>
+        </v-row>
+      </v-container>
+      <v-card-actions class="bg-surface-light">
+        <v-btn 
+          text="Отменить" 
+          variant="plain"
+          @click="departmentDialog.value=false">
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
   import { computed, ref, shallowRef, toRef } from 'vue';
   import axios from 'axios';
   import { VDateInput } from 'vuetify/labs/VDateInput';
-  import { cloneDeep } from 'lodash';
+  import { cloneDeep, indexOf } from 'lodash';
 
   const headers = [
-    { title: 'ID', align: 'start', key: 'id' },
-    { title: 'Название', align: 'start', key: 'name' },
-    { title: 'Описание', align: 'start', key: 'description' },
-    { title: 'Дата создания', align: 'start', key: 'created_at' },
+    { title: 'Номер', align: 'start', key: 'document.number' },
+    { title: 'Тема', align: 'start', key: 'document.subject' },
+    { title: 'Автор', align: 'start', key: 'document.author' },
+    { title: 'Дата создания', align: 'start', key: 'document.created_at' },
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
 
@@ -370,8 +493,11 @@
   ];
 
   const tab = ref('document');
-  const documents = ref([]);
-  const documentDialog = shallowRef(false);  
+  const documents = ref([]);  
+  const positions = ref([]);
+  const documentTypes = ref([]);
+  const documentDialog = shallowRef(false);
+  const departmentDialog = shallowRef(false);
   const documentModel = ref(createNewDocument());
   const tempDocumentModel = createNewDocument();
   const routeStageModel = ref(createNewRouteStage());
@@ -390,27 +516,48 @@
 
   function loadData() {
     Promise.all([
-      axios.get('/api/documents/')
+      axios.get('/api/hr-documents/')
     ])
     .then((responses) => {
       documents.value = responses[0].data;
 
-      for (const document of documents.value)
-        document.created_at = new Date(document.created_at);
+      for (const doc of documents.value)
+        doc.document.created_at = new Date(doc.document.created_at);
     });
+  }
+
+  async function saveDepartment(item) {  
+    documentModel.value.department = item;
+
+    departmentDialog.value = false;
   }
 
   function createNewDocument () {
     return {
       id: 0,
-      name: '',
-      description: '',
-      body: '',
-      created_at: new Date(),
-      route: {
+      employee_name: '',
+      hrDocumentTypeId: null,
+      positionId: null,
+      department: {
         id: 0,
+        name: ''
+      },
+      document: {
+        id: 0,
+        authorId: null,
+        author: {
+          name: ''
+        },
         name: '',
-        routeStages: []
+        subject: '',
+        body: '',
+        duration: 1,
+        created_at: new Date(),
+        route: {
+          id: 0,
+          name: '',
+          routeStages: []
+        }
       }
     };
   }
@@ -431,10 +578,14 @@
     Promise.all([
       axios.get('/api/users/plain'),
       axios.get('/api/departments/'),
+      axios.get('/api/hr-document-types/'),
+      axios.get('/api/positions/'),
     ])
     .then((responses) => {
       users.value = responses[0].data;
       departments.value = responses[1].data;
+      documentTypes.value = responses[2].data;
+      positions.value = responses[3].data;
     });
 
     documentModel.value = createNewDocument();
@@ -442,36 +593,40 @@
   }
 
   function removeDocument(item) {
-    Promise.all([axios.post(`/api/documents/delete`, item)])
+    Promise.all([axios.post(`/api/hr-documents/delete`, item)])
     .then((responses) => {
       const index = documents.value.findIndex(doc => doc.id === item.id);
       documents.value.splice(index, 1);
     });
   }
 
-  function editDocument(id) {
+  function editDocument(item) {
     Promise.all([
       axios.get('/api/users/plain'),
       axios.get('/api/departments/'),
-      axios.get(`/api/routes/${id}`)
+      axios.get('/api/hr-document-types/'),
+      axios.get('/api/positions/'),
+      axios.get(`/api/routes/${item.document.id}`)
     ])
     .then((responses) => {
       users.value = responses[0].data;
       departments.value = responses[1].data;
+      documentTypes.value = responses[2].data;
+      positions.value = responses[3].data;
 
-      tempDocumentModel.value = documents.value.find(item => item.id === id);
-      tempDocumentModel.value.route = responses[2].data;
+      tempDocumentModel.value = documents.value.find(doc => doc.id === item.id);
+      tempDocumentModel.value.document.route = responses[4].data;
 
-      for (const routeStage of tempDocumentModel.value.route.routeStages)
+      for (const routeStage of tempDocumentModel.value.document.route.routeStages)
         routeStage.start_date = new Date(routeStage.start_date);
 
       documentModel.value = cloneDeep({
         id: tempDocumentModel.value.id,
-        name: tempDocumentModel.value.name,
-        description: tempDocumentModel.value.description,
-        body: tempDocumentModel.value.body,
-        created_at: tempDocumentModel.value.created_at,
-        route: tempDocumentModel.value.route
+        employee_name: tempDocumentModel.value.employee_name,
+        hrDocumentTypeId: tempDocumentModel.value.hrDocumentTypeId,
+        positionId: tempDocumentModel.value.positionId,
+        department: tempDocumentModel.value.department,
+        document: tempDocumentModel.value.document
       });
 
       documentDialog.value = true;
@@ -485,16 +640,18 @@
         updated: documentModel.value
       };
 
-      Promise.all([axios.post("/api/documents/update", data)])
+      console.log(data.updated.document.route.routeStages.length);
+
+      Promise.all([axios.post("/api/hr-documents/update", data)])
       .then((responses) => {           
         const index = documents.value.findIndex(item => item.id === documentModel.value.id);
         documents.value[index] = documentModel.value;
       });
     } 
     else {
-      documentModel.value.created_at = documentModel.value.route.routeStages[0].start_date;
+      documentModel.value.document.created_at = documentModel.value.document.route.routeStages[0].start_date;
 
-      Promise.all([axios.post("/api/documents/create", documentModel.value)])
+      Promise.all([axios.post("/api/hr-documents/create", documentModel.value)])
       .then((responses) => { 
         var serverDocument = responses[0].data;
         documents.value.push(serverDocument);
@@ -509,14 +666,18 @@
     documentDialog.value = false;
   }
 
-  function formatRouteStageUsers(routeStageUsers) {
+  function formatUser(user) {
+    return user.position.name +
+            ' ' +
+            user.name;
+  }
+
+  function formatUsers(routeStageUsers) {
     let mergedList = '';
     let len = routeStageUsers.length;
 
     for (let i = 0; i < len; i++) {
-      mergedList += routeStageUsers[i].user.position.name +
-                    ' ' +
-                    routeStageUsers[i].user.name;
+      mergedList += formatUser(routeStageUsers[i].user);
 
       if (i < len - 1)
         mergedList += ', ';
@@ -527,27 +688,27 @@
 
   function addRouteStage() {
     routeStageModel.value = createNewRouteStage();
-    const len = documentModel.value.route.routeStages.length;
+    const len = documentModel.value.document.route.routeStages.length;
 
     if (len > 0)
       routeStageModel.value.start_date.setDate(
-        documentModel.value.route.routeStages[len - 1].start_date.getDate() + 
-        documentModel.value.route.routeStages[len - 1].duration);
+        documentModel.value.document.route.routeStages[len - 1].start_date.getDate() + 
+        documentModel.value.document.route.routeStages[len - 1].duration);
 
     routeStageDialog.value = true;
   }
 
   function removeRouteStage(step) {
-    const index = documentModel.value.route.routeStages.findIndex(item => item.step === step);
-    documentModel.value.route.routeStages.splice(index, 1);
+    const index = documentModel.value.document.route.routeStages.findIndex(item => item.step === step);
+    documentModel.value.document.route.routeStages.splice(index, 1);
     
-    documentModel.value.route.routeStages.forEach((routeStage, index) => {
+    documentModel.value.document.route.routeStages.forEach((routeStage, index) => {
         routeStage.step = index + 1;
     });
   }
 
   function editRouteStage(step) {
-    tempRouteStageModel.value = documentModel.value.route.routeStages
+    tempRouteStageModel.value = documentModel.value.document.route.routeStages
                                 .find(item => item.step === step);
 
     routeStageModel.value = cloneDeep({
@@ -566,12 +727,12 @@
 
   async function saveRouteStage() {  
     if (isEditingRouteStage.value) {
-      const index = documentModel.value.route.routeStages.findIndex(item => item.id === routeStageModel.value.id);
-      documentModel.value.route.routeStages[index] = routeStageModel.value;
+      const index = documentModel.value.document.route.routeStages.findIndex(item => item.id === routeStageModel.value.id);
+      documentModel.value.document.route.routeStages[index] = routeStageModel.value;
       isEditingRouteStage.value = false;
     } else {
-      routeStageModel.value.step = documentModel.value.route.routeStages.length + 1;
-      documentModel.value.route.routeStages.push(routeStageModel.value);
+      routeStageModel.value.step = documentModel.value.document.route.routeStages.length + 1;
+      documentModel.value.document.route.routeStages.push(routeStageModel.value);
     }
 
     routeStageDialog.value = false;
