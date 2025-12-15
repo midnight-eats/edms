@@ -17,6 +17,7 @@ declare module 'vue' {
     ContractTypes: typeof import('./src/components/ContractTypes.vue')['default']
     DeliveryMethods: typeof import('./src/components/DeliveryMethods.vue')['default']
     Departments: typeof import('./src/components/Departments.vue')['default']
+    DocumentDialog: typeof import('./src/components/DocumentDialog.vue')['default']
     Documents: typeof import('./src/components/Documents.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     HRDocuments: typeof import('./src/components/HRDocuments.vue')['default']

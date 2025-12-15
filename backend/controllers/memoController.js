@@ -1,5 +1,5 @@
 const { Document } = require("../models/document.js");
-const { HRDocument } = require("../models/hrDocument.js");
+const { Memo } = require("../models/memo.js");
 const { Department } = require("../models/department.js");
 const { User } = require("../models/user.js");
 const { Position } = require("../models/position.js");
@@ -7,8 +7,8 @@ const { Route } = require("../models/route.js");
 const { RouteStage } = require("../models/routeStage.js");
 const { RouteStageUser } = require("../models/routeStageUser.js");
 
-async function hrDocumentGet(request, response) {
-  await HRDocument.findAll({ 
+async function memoGet(request, response) {
+  await Memo.findAll({ 
     where: {
       is_deleted: false
     },
@@ -36,12 +36,12 @@ async function hrDocumentGet(request, response) {
   .catch(err => console.log(err));
 }
 
-async function hrDocumentPostDelete(request, response) {
-  const hrDocument = request.body;
+async function memoPostDelete(request, response) {
+  const memo = request.body;
 
   const route = await Route.findOne({
     where: {
-      documentId: hrDocument.document.id,
+      documentId: memo.document.id,
       is_deleted: false
     },
     include: [{
@@ -60,15 +60,15 @@ async function hrDocumentPostDelete(request, response) {
 
   const routeStages = route.routeStages;
 
-  const sequelize = HRDocument.sequelize;
+  const sequelize = Memo.sequelize;
   const transaction = await sequelize.transaction();
 
   try {
-    const deletedHRDocument = await HRDocument.update({ 
+    const deletedMemo = await Memo.update({ 
       is_deleted: true
     }, {
       where: {
-        id: hrDocument.id
+        id: memo.id
       }
     });
 
@@ -76,7 +76,7 @@ async function hrDocumentPostDelete(request, response) {
       is_deleted: true
     }, {
       where: {
-        id: hrDocument.document.id
+        id: memo.document.id
       }
     });
 
@@ -84,7 +84,7 @@ async function hrDocumentPostDelete(request, response) {
       is_deleted: true
     }, {
       where: {
-        documentId: hrDocument.document.id
+        documentId: memo.document.id
       }
     });
 
@@ -110,39 +110,39 @@ async function hrDocumentPostDelete(request, response) {
 
     await transaction.commit();
 
-    response.json(deletedHRDocument);
+    response.json(deletedMemo);
   } catch (err) {
     console.log(err);
   }
 }
 
-async function hrDocumentPostCreate(request, response) {
-  const hrDocument = request.body;
-  const route = hrDocument.document.route;
+async function memoPostCreate(request, response) {
+  const memo = request.body;
+  const route = memo.document.route;
   const routeStages = route.routeStages;
 
-  const sequelize = HRDocument.sequelize;
+  const sequelize = Memo.sequelize;
   const transaction = await sequelize.transaction();
 
   try {
-    console.log(`Create ${hrDocument}`)
+    console.log(`Create ${memo}`)
     
     const createdDocument = await Document.create({
-      number: hrDocument.document.number,
-      subject: hrDocument.document.subject,
-      body: hrDocument.document.body,
-      duration: hrDocument.document.duration,
-      authorId: hrDocument.document.authorId
+      number: memo.document.number,
+      subject: memo.document.subject,
+      body: memo.document.body,
+      duration: memo.document.duration,
+      authorId: memo.document.authorId
     }, { 
       transaction: transaction 
     });
 
-    const createdHRDocument = await HRDocument.create({
+    const createdMemo = await Memo.create({
       documentId: createdDocument.id,
-      employee_name: hrDocument.employee_name,
-      hrDocumentTypeId: hrDocument.hrDocumentTypeId,
-      positionId: hrDocument.positionId,
-      departmentId: hrDocument.department.id,
+      employee_name: memo.employee_name,
+      memoTypeId: memo.memoTypeId,
+      positionId: memo.positionId,
+      departmentId: memo.department.id,
       include: [{
         model: Document,
         as: 'document',
@@ -192,7 +192,7 @@ async function hrDocumentPostCreate(request, response) {
 
     await transaction.commit();
 
-    response.json(createdHRDocument);
+    response.json(createdMemo);
   } catch (err) {
     await transaction.rollback();
 
@@ -200,40 +200,39 @@ async function hrDocumentPostCreate(request, response) {
   }
 }
 
-async function hrDocumentPostUpdate(request, response) {
+async function memoPostUpdate(request, response) {
   const { original, updated } = request.body;
 
   const originalRouteStages = original.document.route.routeStages;
 
-  const updatedHRDocument = updated;
+  const updatedMemo = updated;
   const updatedRoute = updated.document.route;
   const updatedRouteStages = updated.document.route.routeStages;
 
-  const sequelize = HRDocument.sequelize;
+  const sequelize = Memo.sequelize;
   const transaction = await sequelize.transaction();
 
   try {
     console.log(`Update ${original}`);
-    console.log(updatedHRDocument.document.authorId);
 
     const updatedDocument = await Document.update({
-      number: updatedHRDocument.document.number,
-      subject: updatedHRDocument.document.subject,
-      body: updatedHRDocument.document.body,
-      duration: updatedHRDocument.document.duration,
-      authorId: updatedHRDocument.document.authorId,
+      number: updatedMemo.document.number,
+      subject: updatedMemo.document.subject,
+      body: updatedMemo.document.body,
+      duration: updatedMemo.document.duration,
+      authorId: updatedMemo.document.authorId,
     }, {
-      where: { id: updatedHRDocument.document.id },
+      where: { id: updatedMemo.document.id },
       transaction: transaction 
     });
 
-    const updatedHRDocumentRes = await HRDocument.update({
-      employee_name: updatedHRDocument.employee_name,
-      hrDocumentTypeId: updatedHRDocument.hrDocumentTypeId,
-      positionId: updatedHRDocument.positionId,
-      departmentId: updatedHRDocument.department.id,
+    const updatedMemoRes = await Memo.update({
+      employee_name: updatedMemo.employee_name,
+      memoTypeId: updatedMemo.memoTypeId,
+      positionId: updatedMemo.positionId,
+      departmentId: updatedMemo.department.id,
     }, {
-      where: { id: updatedHRDocument.id },
+      where: { id: updatedMemo.id },
       transaction: transaction 
     });
 
@@ -348,7 +347,7 @@ async function hrDocumentPostUpdate(request, response) {
 
     await transaction.commit();
 
-    response.json(updatedHRDocumentRes);
+    response.json(updatedMemoRes);
   } catch (err) {
     await transaction.rollback();
 
@@ -357,8 +356,8 @@ async function hrDocumentPostUpdate(request, response) {
 }
 
 module.exports = { 
-  hrDocumentGet, 
-  hrDocumentPostCreate, 
-  hrDocumentPostDelete, 
-  hrDocumentPostUpdate 
+  memoGet, 
+  memoPostCreate, 
+  memoPostDelete, 
+  memoPostUpdate 
 }

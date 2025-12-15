@@ -15,6 +15,7 @@ import Documents from '@/components/Documents.vue'
 import HRDocumentTypes from '@/components/HRDocumentTypes.vue'
 import HRDocuments from '@/components/HRDocuments.vue'
 import MemoTypes from '@/components/MemoTypes.vue'
+import Memos from '@/components/Memos.vue'
 import ContractTypes from '@/components/ContractTypes.vue'
 import AdministrativeDocumentTypes from '@/components/AdministrativeDocumentTypes.vue'
 import DeliveryMethods from '@/components/DeliveryMethods.vue'
@@ -31,6 +32,7 @@ const routes = [
   { path: '/hr-document-types', component: HRDocumentTypes },
   { path: '/hr-documents', component: HRDocuments },
   { path: '/memo-types', component: MemoTypes },
+  { path: '/memos', component: Memos },
   { path: '/contract-types', component: ContractTypes },
   { path: '/administrative-document-types', component: AdministrativeDocumentTypes },
   { path: '/delivery-methods', component: DeliveryMethods }

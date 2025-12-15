@@ -68,16 +68,17 @@
         <container>
           <v-row>
             <v-col cols="12">
-              <v-autocomplete
+              <v-select
                 label="Автор"
                 :items="users"
                 item-title="name"
                 item-value="id"
-                v-model="documentModel.document.author"
-                readonly
-                @click="addUser('author')"
+                v-model="documentModel.document.authorId"
               >
-              </v-autocomplete>
+                <template v-slot:item="{ props: itemProps, item }">
+                  <v-list-item v-bind="itemProps" :subtitle="item.raw.position.name"></v-list-item>
+                </template>
+              </v-select>
             </v-col>
           </v-row>
           <v-row>
@@ -287,7 +288,7 @@
                   prepend-icon="mdi-plus"
                   rounded="lg"
                   text="Добавить"
-                  @click="addUser('routestageuser')"
+                  @click="addRouteStageUser()"
                 ></v-btn>
               </v-toolbar>
             </template>
@@ -298,7 +299,7 @@
                   color="medium-emphasis" 
                   icon="mdi-delete" 
                   size="small"
-                  @click="removeUser(item.id)"></v-icon>
+                  @click="removeRouteStageUser(item.id)"></v-icon>
               </div>
             </template>  
           </v-data-table-virtual>
@@ -389,7 +390,7 @@
                     color="medium-emphasis" 
                     icon="mdi-plus" 
                     size="small" 
-                    @click="saveUser(item)">
+                    @click="saveRouteStageUser(item)">
                   </v-icon>
                 </div>
               </template>
@@ -404,7 +405,7 @@
       <v-btn 
         text="Отменить" 
         variant="plain"
-        @click="cancelUser">
+        @click="cancelRouteStageUser">
       </v-btn>
     </v-card-actions>
     </v-card>
@@ -492,7 +493,6 @@
   ];
 
   const tab = ref('document');
-  const state = ref('');
   const documents = ref([]);  
   const positions = ref([]);
   const documentTypes = ref([]);
@@ -512,10 +512,7 @@
   const users = ref([]);
   const filteredUsers = computed(() => {
     return users.value.filter(item => item.departmentId === selectedDepartment.value[0]);
-  });
-  const isRouteStageUser = computed(() => {
-    return routeStageDialog.value;
-  });
+  })
 
   function loadData() {
     Promise.all([
@@ -746,36 +743,27 @@
   }
 
 
-  function addUser(currState) {
-    state.value = currState;
-
+  function addRouteStageUser() {
     userDialog.value = true;
   }
 
-  function removeUser(id) {
+  function removeRouteStageUser(id) {
     const index = routeStageModel.value.routeStageUsers.findIndex(item => item.id === id);
     routeStageModel.value.routeStageUsers.splice(index, 1);
   }
 
-  async function saveUser(user) {
-    if (state.value == 'routestageuser') {    
-      routeStageModel.value.routeStageUsers.push({
-        id: 0,
-        routeStageId: routeStageModel.value.id,
-        userId: user.id,
-        user: user
-      });
-    }
-    else if (state.value == 'author') {
-      documentModel.value.document.author = user;
-      documentModel.value.document.authorId = user.id;
-    }
+  async function saveRouteStageUser(user) {
+    routeStageModel.value.routeStageUsers.push({
+      id: 0,
+      routeStageId: routeStageModel.value.id,
+      userId: user.id,
+      user: user
+    });
 
-    state.value = '';
     userDialog.value = false;
   }
 
-  function cancelUser() {
+  function cancelRouteStageUser() {
     userDialog.value = false;
   }
 
