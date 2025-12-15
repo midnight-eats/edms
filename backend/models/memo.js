@@ -12,30 +12,17 @@ const Memo = connection.define("memos", {
     primaryKey: true,
     allowNull: false
   },
-  subject: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    validate: {
-      notEmpty: {
-        msg: 'Subject cannot be empty'
-      }
-    }
-  },
-  description: {
-    type: Sequelize.TEXT,
-    allowNull: false,
-    validate: {
-      notEmpty: {
-        msg: 'Description cannot be empty'
-      }
-    }
+  is_deleted: {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
   }}, {
     timestamps: false
   }
 );
 
 Memo.belongsTo(Document);
-Memo.belongsTo(User, { as: 'author_manager' });
+Memo.belongsTo(User, { as: 'authorManager' });
 Memo.belongsTo(User, { as: 'signatory' });
 Memo.belongsTo(MemoType);
 

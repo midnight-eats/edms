@@ -549,9 +549,9 @@
         id: 0,
         authorId: null,
         author: {
+          id: 0,
           name: ''
         },
-        name: '',
         subject: '',
         body: '',
         duration: 1,

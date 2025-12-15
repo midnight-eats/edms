@@ -26,8 +26,11 @@ async function memoGet(request, response) {
         }]
       }]
     }, {
-      model: Department,
-      as: 'department'
+      model: User,
+      as: 'authorManager'
+    }, {
+      model: User,
+      as: 'signatory'
     }]
   })
   .then((res) => {
@@ -137,30 +140,6 @@ async function memoPostCreate(request, response) {
       transaction: transaction 
     });
 
-    const createdMemo = await Memo.create({
-      documentId: createdDocument.id,
-      employee_name: memo.employee_name,
-      memoTypeId: memo.memoTypeId,
-      positionId: memo.positionId,
-      departmentId: memo.department.id,
-      include: [{
-        model: Document,
-        as: 'document',
-        required: false,
-        include: [{
-          model: User,
-          as: 'author',
-          required: false,
-          include: [{
-            model: Position,
-            required: false,
-          }]
-        }]
-      }]
-    }, { 
-      transaction: transaction 
-    });
-
     const createdRoute = await Route.create({
       name: route.name,
       documentId: createdDocument.id
@@ -190,6 +169,29 @@ async function memoPostCreate(request, response) {
       }
     }
 
+    const createdMemo = await Memo.create({
+      documentId: createdDocument.id,
+      authorManagerId: memo.authorManagerId,
+      memoTypeId: memo.memoTypeId,
+      signatoryId: memo.signatoryId,
+      include: [{
+        model: Document,
+        as: 'document',
+        required: false,
+        include: [{
+          model: User,
+          as: 'author',
+          required: false,
+          include: [{
+            model: Position,
+            required: false,
+          }]
+        }]
+      }]
+    }, { 
+      transaction: transaction 
+    });
+
     await transaction.commit();
 
     response.json(createdMemo);
@@ -214,6 +216,7 @@ async function memoPostUpdate(request, response) {
 
   try {
     console.log(`Update ${original}`);
+    console.log(updatedMemo.document.authorId);
 
     const updatedDocument = await Document.update({
       number: updatedMemo.document.number,
@@ -227,10 +230,9 @@ async function memoPostUpdate(request, response) {
     });
 
     const updatedMemoRes = await Memo.update({
-      employee_name: updatedMemo.employee_name,
+      authorManagerId: updatedMemo.authorManagerId,
       memoTypeId: updatedMemo.memoTypeId,
-      positionId: updatedMemo.positionId,
-      departmentId: updatedMemo.department.id,
+      signatoryId: updatedMemo.signatoryId,
     }, {
       where: { id: updatedMemo.id },
       transaction: transaction 

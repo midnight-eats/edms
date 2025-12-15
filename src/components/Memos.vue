@@ -68,17 +68,16 @@
         <container>
           <v-row>
             <v-col cols="12">
-              <v-select
+              <v-autocomplete
                 label="Автор"
                 :items="users"
                 item-title="name"
                 item-value="id"
                 v-model="documentModel.document.authorId"
+                readonly
+                @click="addUser('author')"
               >
-                <template v-slot:item="{ props: itemProps, item }">
-                  <v-list-item v-bind="itemProps" :subtitle="item.raw.position.name"></v-list-item>
-                </template>
-              </v-select>
+              </v-autocomplete>
             </v-col>
           </v-row>
           <v-row>
@@ -88,7 +87,7 @@
                 :items="documentTypes"
                 item-title="name"
                 item-value="id"
-                v-model="documentModel.hrDocumentTypeId"
+                v-model="documentModel.memoTypeId"
               ></v-select>
             </v-col>
           </v-row>
@@ -123,38 +122,32 @@
               ></v-number-input>
             </v-col>
           </v-row>
-          <!-- other fields for different types of document -->
           <v-row>
             <v-col cols="12">
-              <v-text-field 
-                v-model="documentModel.employee_name"
-                label="ФИО сотрудника"
-                required
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12">
-              <v-select
-                label="Должность"
-                :items="positions"
+              <v-autocomplete
+                label="Руководитель инциатора"
+                :items="users"
                 item-title="name"
                 item-value="id"
-                v-model="documentModel.positionId"
-              ></v-select>
+                v-model="documentModel.authorManagerId"
+                readonly
+                @click="addUser('authormanagerid')"
+              >
+              </v-autocomplete>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="12">
               <v-autocomplete
-                label="Подразделение"
-                :items="departments"
+                label="Подписант"
+                :items="users"
                 item-title="name"
                 item-value="id"
-                v-model="documentModel.department"
+                v-model="documentModel.signatoryId"
                 readonly
-                @click="departmentDialog=true"
-              ></v-autocomplete>
+                @click="addUser('signatory')"
+              >
+              </v-autocomplete>
             </v-col>
           </v-row>
         </container>
@@ -288,7 +281,7 @@
                   prepend-icon="mdi-plus"
                   rounded="lg"
                   text="Добавить"
-                  @click="addRouteStageUser()"
+                  @click="addUser('routestageuser')"
                 ></v-btn>
               </v-toolbar>
             </template>
@@ -299,7 +292,7 @@
                   color="medium-emphasis" 
                   icon="mdi-delete" 
                   size="small"
-                  @click="removeRouteStageUser(item.id)"></v-icon>
+                  @click="removeUser(item.id)"></v-icon>
               </div>
             </template>  
           </v-data-table-virtual>
@@ -390,7 +383,7 @@
                     color="medium-emphasis" 
                     icon="mdi-plus" 
                     size="small" 
-                    @click="saveRouteStageUser(item)">
+                    @click="saveUser(item)">
                   </v-icon>
                 </div>
               </template>
@@ -405,7 +398,7 @@
       <v-btn 
         text="Отменить" 
         variant="plain"
-        @click="cancelRouteStageUser">
+        @click="cancelUser">
       </v-btn>
     </v-card-actions>
     </v-card>
@@ -493,8 +486,8 @@
   ];
 
   const tab = ref('document');
-  const documents = ref([]);  
-  const positions = ref([]);
+  const state = ref('');
+  const documents = ref([]);
   const documentTypes = ref([]);
   const documentDialog = shallowRef(false);
   const departmentDialog = shallowRef(false);
@@ -512,11 +505,11 @@
   const users = ref([]);
   const filteredUsers = computed(() => {
     return users.value.filter(item => item.departmentId === selectedDepartment.value[0]);
-  })
+  });
 
   function loadData() {
     Promise.all([
-      axios.get('/api/hr-documents/')
+      axios.get('/api/memos/')
     ])
     .then((responses) => {
       documents.value = responses[0].data;
@@ -535,20 +528,24 @@
   function createNewDocument () {
     return {
       id: 0,
-      employee_name: '',
-      hrDocumentTypeId: null,
-      positionId: null,
-      department: {
+      memoTypeId: null,
+      authorManagerId: null,
+      authorManager: {
         id: 0,
-        name: ''
+        name: ''        
       },
+      signatory: {
+        id: 0,
+        name: ''        
+      },
+      signatoryId: null,
       document: {
         id: 0,
         authorId: null,
         author: {
+          id: 0,
           name: ''
         },
-        name: '',
         subject: '',
         body: '',
         duration: 1,
@@ -578,14 +575,12 @@
     Promise.all([
       axios.get('/api/users/plain'),
       axios.get('/api/departments/'),
-      axios.get('/api/hr-document-types/'),
-      axios.get('/api/positions/'),
+      axios.get('/api/memo-types/')
     ])
     .then((responses) => {
       users.value = responses[0].data;
       departments.value = responses[1].data;
       documentTypes.value = responses[2].data;
-      positions.value = responses[3].data;
     });
 
     documentModel.value = createNewDocument();
@@ -593,7 +588,7 @@
   }
 
   function removeDocument(item) {
-    Promise.all([axios.post(`/api/hr-documents/delete`, item)])
+    Promise.all([axios.post(`/api/memos/delete`, item)])
     .then((responses) => {
       const index = documents.value.findIndex(doc => doc.id === item.id);
       documents.value.splice(index, 1);
@@ -604,30 +599,31 @@
     Promise.all([
       axios.get('/api/users/plain'),
       axios.get('/api/departments/'),
-      axios.get('/api/hr-document-types/'),
-      axios.get('/api/positions/'),
+      axios.get('/api/memo-types/'),
       axios.get(`/api/routes/${item.document.id}`)
     ])
     .then((responses) => {
       users.value = responses[0].data;
       departments.value = responses[1].data;
       documentTypes.value = responses[2].data;
-      positions.value = responses[3].data;
 
       tempDocumentModel.value = documents.value.find(doc => doc.id === item.id);
-      tempDocumentModel.value.document.route = responses[4].data;
+      tempDocumentModel.value.document.route = responses[3].data;
 
       for (const routeStage of tempDocumentModel.value.document.route.routeStages)
         routeStage.start_date = new Date(routeStage.start_date);
 
       documentModel.value = cloneDeep({
         id: tempDocumentModel.value.id,
-        employee_name: tempDocumentModel.value.employee_name,
-        hrDocumentTypeId: tempDocumentModel.value.hrDocumentTypeId,
-        positionId: tempDocumentModel.value.positionId,
-        department: tempDocumentModel.value.department,
+        authorManager: tempDocumentModel.value.authorManager, 
+        authorManagerId: tempDocumentModel.value.authorManagerId,
+        signatory: tempDocumentModel.value.signatory, 
+        signatoryId: tempDocumentModel.value.signatoryId,
+        memoTypeId: tempDocumentModel.value.memoTypeId,
         document: tempDocumentModel.value.document
       });
+
+      console.log(documentModel.value.authorManagerId);
 
       documentDialog.value = true;
     });
@@ -642,7 +638,7 @@
 
       console.log(data.updated.document.route.routeStages.length);
 
-      Promise.all([axios.post("/api/hr-documents/update", data)])
+      Promise.all([axios.post("/api/memos/update", data)])
       .then((responses) => {           
         const index = documents.value.findIndex(item => item.id === documentModel.value.id);
         documents.value[index] = documentModel.value;
@@ -651,7 +647,7 @@
     else {
       documentModel.value.document.created_at = documentModel.value.document.route.routeStages[0].start_date;
 
-      Promise.all([axios.post("/api/hr-documents/create", documentModel.value)])
+      Promise.all([axios.post("/api/memos/create", documentModel.value)])
       .then((responses) => { 
         var serverDocument = responses[0].data;
         documents.value.push(serverDocument);
@@ -743,27 +739,41 @@
   }
 
 
-  function addRouteStageUser() {
+  function addUser(currState) {
+    state.value = currState;
+
     userDialog.value = true;
   }
 
-  function removeRouteStageUser(id) {
+  function removeUser(id) {
     const index = routeStageModel.value.routeStageUsers.findIndex(item => item.id === id);
     routeStageModel.value.routeStageUsers.splice(index, 1);
   }
 
-  async function saveRouteStageUser(user) {
-    routeStageModel.value.routeStageUsers.push({
-      id: 0,
-      routeStageId: routeStageModel.value.id,
-      userId: user.id,
-      user: user
-    });
+  async function saveUser(user) {
+    if (state.value == 'routestageuser') {    
+      routeStageModel.value.routeStageUsers.push({
+        id: 0,
+        routeStageId: routeStageModel.value.id,
+        userId: user.id,
+        user: user
+      });
+    } else if (state.value == 'author') {
+      documentModel.value.document.author = user;
+      documentModel.value.document.authorId = user.id;
+    } else if (state.value == 'authormanagerid') {
+      documentModel.value.document.authorManager = user;
+      documentModel.value.document.authorManagerId = user.id;
+    } else if (state.value == 'signatory') {
+      documentModel.value.document.signatory = user;
+      documentModel.value.document.signatoryId = user.id;
+    }
 
+    state.value = '';
     userDialog.value = false;
   }
 
-  function cancelRouteStageUser() {
+  function cancelUser() {
     userDialog.value = false;
   }
 
