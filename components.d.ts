@@ -30,6 +30,8 @@ declare module 'vue' {
     Memos: typeof import('./src/components/Memos.vue')['default']
     MemoTypes: typeof import('./src/components/MemoTypes.vue')['default']
     OneFieldDataTable: typeof import('./src/components/OneFieldDataTable.vue')['default']
+    OutgoingCorrespondence: typeof import('./src/components/OutgoingCorrespondence.vue')['default']
+    OutgoingCorrespondences: typeof import('./src/components/OutgoingCorrespondences.vue')['default']
     Positions: typeof import('./src/components/Positions.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

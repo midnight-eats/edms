@@ -19,6 +19,7 @@ const { administrativeDocumentTypeRouter } = require("./routers/administrativeDo
 const { administrativeDocumentRouter } = require("./routers/administrativeDocumentRouter.js");
 const { deliveryMethodRouter } = require("./routers/deliveryMethodRouter.js");
 const { counterpartyRouter } = require("./routers/counterpartyRouter.js");
+const { outgoingCorrespondenceRouter } = require("./routers/outgoingCorrespondenceRouter.js");
 
 app.use("/api/positions/", positionRouter);
 app.use("/api/categories/", categoryRouter);
@@ -36,6 +37,7 @@ app.use("/api/administrative-document-types/", administrativeDocumentTypeRouter)
 app.use("/api/administrative-documents/", administrativeDocumentRouter);
 app.use("/api/delivery-methods/", deliveryMethodRouter);
 app.use("/api/counterparties/", counterpartyRouter);
+app.use("/api/outgoing-correspondences/", outgoingCorrespondenceRouter);
    
 app.use("/about", function (request, response) {
     response.send("О сайте");
