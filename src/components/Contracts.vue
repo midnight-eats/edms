@@ -21,7 +21,7 @@
             icon="mdi-book-multiple" 
             size="x-small" start>
           </v-icon>
-          Кадровые документы
+          Договоры
         </v-toolbar-title>
 
         <v-btn
@@ -87,7 +87,7 @@
                 :items="documentTypes"
                 item-title="name"
                 item-value="id"
-                v-model="documentModel.hrDocumentTypeId"
+                v-model="documentModel.contractTypeId"
               ></v-select>
             </v-col>
           </v-row>
@@ -124,35 +124,26 @@
           </v-row>
           <v-row>
             <v-col cols="12">
-              <v-text-field 
-                v-model="documentModel.employee_name"
-                label="ФИО сотрудника"
-                required
-              ></v-text-field>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12">
               <v-select
-                label="Должность"
-                :items="positions"
+                label="Контрагент"
+                :items="counterparties"
                 item-title="name"
                 item-value="id"
-                v-model="documentModel.positionId"
+                v-model="documentModel.counterpartyId"
               ></v-select>
             </v-col>
           </v-row>
           <v-row>
             <v-col cols="12">
-              <v-autocomplete
-                label="Подразделение"
-                :items="departments"
-                item-title="name"
-                item-value="id"
-                v-model="documentModel.department"
-                readonly
-                @click="departmentDialog=true"
-              ></v-autocomplete>
+              <v-number-input
+                v-model="documentModel.sum"
+                :reverse="false"
+                controlVariant="default"
+                label="Сумма"
+                :hideInput="false"
+                :inset="false"
+                :min="1"
+              ></v-number-input>
             </v-col>
           </v-row>
         </container>
@@ -492,8 +483,7 @@
 
   const tab = ref('document');
   const state = ref('');
-  const documents = ref([]);  
-  const positions = ref([]);
+  const documents = ref([]);
   const documentTypes = ref([]);
   const documentDialog = shallowRef(false);
   const departmentDialog = shallowRef(false);
@@ -509,13 +499,14 @@
   const selectedDepartment = ref([]);
   const departments = ref([]);
   const users = ref([]);
+  const counterparties = ref([]);
   const filteredUsers = computed(() => {
     return users.value.filter(item => item.departmentId === selectedDepartment.value[0]);
   });
 
   function loadData() {
     Promise.all([
-      axios.get('/api/hr-documents/')
+      axios.get('/api/contracts/')
     ])
     .then((responses) => {
       documents.value = responses[0].data;
@@ -534,13 +525,9 @@
   function createNewDocument () {
     return {
       id: 0,
-      employee_name: '',
-      hrDocumentTypeId: null,
-      positionId: null,
-      department: {
-        id: 0,
-        name: ''
-      },
+      contractTypeId: null,
+      counterpartyId: null,
+      sum: 1,
       document: {
         id: 0,
         authorId: null,
@@ -577,14 +564,14 @@
     Promise.all([
       axios.get('/api/users/plain'),
       axios.get('/api/departments/'),
-      axios.get('/api/hr-document-types/'),
-      axios.get('/api/positions/'),
+      axios.get('/api/contract-types/'),
+      axios.get('/api/counterparties/')
     ])
     .then((responses) => {
       users.value = responses[0].data;
       departments.value = responses[1].data;
       documentTypes.value = responses[2].data;
-      positions.value = responses[3].data;
+      counterparties.value = responses[3].data;
     });
 
     documentModel.value = createNewDocument();
@@ -592,7 +579,7 @@
   }
 
   function removeDocument(item) {
-    Promise.all([axios.post(`/api/hr-documents/delete`, item)])
+    Promise.all([axios.post(`/api/contracts/delete`, item)])
     .then((responses) => {
       const index = documents.value.findIndex(doc => doc.id === item.id);
       documents.value.splice(index, 1);
@@ -603,15 +590,15 @@
     Promise.all([
       axios.get('/api/users/plain'),
       axios.get('/api/departments/'),
-      axios.get('/api/hr-document-types/'),
-      axios.get('/api/positions/'),
+      axios.get('/api/contract-types/'),
+      axios.get('/api/counterparties/'),
       axios.get(`/api/routes/${item.document.id}`)
     ])
     .then((responses) => {
       users.value = responses[0].data;
       departments.value = responses[1].data;
       documentTypes.value = responses[2].data;
-      positions.value = responses[3].data;
+      counterparties.value = responses[3].data;
 
       tempDocumentModel.value = documents.value.find(doc => doc.id === item.id);
       tempDocumentModel.value.document.route = responses[4].data;
@@ -621,10 +608,9 @@
 
       documentModel.value = cloneDeep({
         id: tempDocumentModel.value.id,
-        employee_name: tempDocumentModel.value.employee_name,
-        hrDocumentTypeId: tempDocumentModel.value.hrDocumentTypeId,
-        positionId: tempDocumentModel.value.positionId,
-        department: tempDocumentModel.value.department,
+        sum: tempDocumentModel.value.sum,
+        counterpartyId: tempDocumentModel.value.counterpartyId,
+        contractTypeId: tempDocumentModel.value.contractTypeId,
         document: tempDocumentModel.value.document
       });
 
@@ -641,7 +627,7 @@
 
       console.log(data.updated.document.route.routeStages.length);
 
-      Promise.all([axios.post("/api/hr-documents/update", data)])
+      Promise.all([axios.post("/api/contracts/update", data)])
       .then((responses) => {           
         const index = documents.value.findIndex(item => item.id === documentModel.value.id);
         documents.value[index] = documentModel.value;
@@ -650,7 +636,7 @@
     else {
       documentModel.value.document.created_at = documentModel.value.document.route.routeStages[0].start_date;
 
-      Promise.all([axios.post("/api/hr-documents/create", documentModel.value)])
+      Promise.all([axios.post("/api/contracts/create", documentModel.value)])
       .then((responses) => { 
         var serverDocument = responses[0].data;
         serverDocument.document.created_at = new Date(serverDocument.document.created_at);
@@ -762,8 +748,7 @@
         userId: user.id,
         user: user
       });
-    }
-    else if (state.value == 'author') {
+    } else if (state.value == 'author') {
       documentModel.value.document.author = user;
       documentModel.value.document.authorId = user.id;
     }

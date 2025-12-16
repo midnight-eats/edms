@@ -173,7 +173,18 @@ async function memoPostCreate(request, response) {
       documentId: createdDocument.id,
       authorManagerId: memo.authorManagerId,
       memoTypeId: memo.memoTypeId,
-      signatoryId: memo.signatoryId,
+      signatoryId: memo.signatoryId
+    }, { 
+      transaction: transaction 
+    });
+
+    await transaction.commit();
+
+    const completeMemo = await Memo.findOne({
+      where: { 
+        id: createdMemo.id,
+        is_deleted: false
+      },
       include: [{
         model: Document,
         as: 'document',
@@ -187,14 +198,16 @@ async function memoPostCreate(request, response) {
             required: false,
           }]
         }]
+      }, {
+        model: User,
+        as: 'authorManager'
+      }, {
+        model: User,
+        as: 'signatory'
       }]
-    }, { 
-      transaction: transaction 
     });
 
-    await transaction.commit();
-
-    response.json(createdMemo);
+    response.json(completeMemo);
   } catch (err) {
     await transaction.rollback();
 

@@ -1,14 +1,13 @@
 const { Document } = require("../models/document.js");
-const { HRDocument } = require("../models/hrDocument.js");
-const { Department } = require("../models/department.js");
+const { Contract } = require("../models/contract.js");
 const { User } = require("../models/user.js");
 const { Position } = require("../models/position.js");
 const { Route } = require("../models/route.js");
 const { RouteStage } = require("../models/routeStage.js");
 const { RouteStageUser } = require("../models/routeStageUser.js");
 
-async function hrDocumentGet(request, response) {
-  await HRDocument.findAll({ 
+async function contractGet(request, response) {
+  await Contract.findAll({ 
     where: {
       is_deleted: false
     },
@@ -25,9 +24,6 @@ async function hrDocumentGet(request, response) {
           required: false,
         }]
       }]
-    }, {
-      model: Department,
-      as: 'department'
     }]
   })
   .then((res) => {
@@ -36,12 +32,12 @@ async function hrDocumentGet(request, response) {
   .catch(err => console.log(err));
 }
 
-async function hrDocumentPostDelete(request, response) {
-  const hrDocument = request.body;
+async function contractPostDelete(request, response) {
+  const contract = request.body;
 
   const route = await Route.findOne({
     where: {
-      documentId: hrDocument.document.id,
+      documentId: contract.document.id,
       is_deleted: false
     },
     include: [{
@@ -60,15 +56,15 @@ async function hrDocumentPostDelete(request, response) {
 
   const routeStages = route.routeStages;
 
-  const sequelize = HRDocument.sequelize;
+  const sequelize = Contract.sequelize;
   const transaction = await sequelize.transaction();
 
   try {
-    const deletedHRDocument = await HRDocument.update({ 
+    const deletedContract = await Contract.update({ 
       is_deleted: true
     }, {
       where: {
-        id: hrDocument.id
+        id: contract.id
       }
     });
 
@@ -76,7 +72,7 @@ async function hrDocumentPostDelete(request, response) {
       is_deleted: true
     }, {
       where: {
-        id: hrDocument.document.id
+        id: contract.document.id
       }
     });
 
@@ -84,7 +80,7 @@ async function hrDocumentPostDelete(request, response) {
       is_deleted: true
     }, {
       where: {
-        documentId: hrDocument.document.id
+        documentId: contract.document.id
       }
     });
 
@@ -110,53 +106,29 @@ async function hrDocumentPostDelete(request, response) {
 
     await transaction.commit();
 
-    response.json(deletedHRDocument);
+    response.json(deletedContract);
   } catch (err) {
     console.log(err);
   }
 }
 
-async function hrDocumentPostCreate(request, response) {
-  const hrDocument = request.body;
-  const route = hrDocument.document.route;
+async function contractPostCreate(request, response) {
+  const contract = request.body;
+  const route = contract.document.route;
   const routeStages = route.routeStages;
 
-  const sequelize = HRDocument.sequelize;
+  const sequelize = Contract.sequelize;
   const transaction = await sequelize.transaction();
 
   try {
-    console.log(`Create ${hrDocument}`)
+    console.log(`Create ${contract}`)
     
     const createdDocument = await Document.create({
-      number: hrDocument.document.number,
-      subject: hrDocument.document.subject,
-      body: hrDocument.document.body,
-      duration: hrDocument.document.duration,
-      authorId: hrDocument.document.authorId
-    }, { 
-      transaction: transaction 
-    });
-
-    const createdHRDocument = await HRDocument.create({
-      documentId: createdDocument.id,
-      employee_name: hrDocument.employee_name,
-      hrDocumentTypeId: hrDocument.hrDocumentTypeId,
-      positionId: hrDocument.positionId,
-      departmentId: hrDocument.department.id,
-      include: [{
-        model: Document,
-        as: 'document',
-        required: false,
-        include: [{
-          model: User,
-          as: 'author',
-          required: false,
-          include: [{
-            model: Position,
-            required: false,
-          }]
-        }]
-      }]
+      number: contract.document.number,
+      subject: contract.document.subject,
+      body: contract.document.body,
+      duration: contract.document.duration,
+      authorId: contract.document.authorId
     }, { 
       transaction: transaction 
     });
@@ -190,11 +162,20 @@ async function hrDocumentPostCreate(request, response) {
       }
     }
 
+    const createdContract = await Contract.create({
+      documentId: createdDocument.id,
+      sum: contract.sum,
+      counterpartyId: contract.counterpartyId,
+      contractTypeId: contract.contractTypeId
+    }, { 
+      transaction: transaction 
+    });
+
     await transaction.commit();
 
-    const completeHRDocument = await HRDocument.findOne({ 
-      where: {
-        id: createdHRDocument.id,
+    const completeContract = await Contract.findOne({
+      where: { 
+        id: createdContract.id,
         is_deleted: false
       },
       include: [{
@@ -210,13 +191,10 @@ async function hrDocumentPostCreate(request, response) {
             required: false,
           }]
         }]
-      }, {
-        model: Department,
-        as: 'department'
       }]
-    })
+    });
 
-    response.json(completeHRDocument);
+    response.json(completeContract);
   } catch (err) {
     await transaction.rollback();
 
@@ -224,40 +202,38 @@ async function hrDocumentPostCreate(request, response) {
   }
 }
 
-async function hrDocumentPostUpdate(request, response) {
+async function contractPostUpdate(request, response) {
   const { original, updated } = request.body;
 
   const originalRouteStages = original.document.route.routeStages;
 
-  const updatedHRDocument = updated;
+  const updatedContract = updated;
   const updatedRoute = updated.document.route;
   const updatedRouteStages = updated.document.route.routeStages;
 
-  const sequelize = HRDocument.sequelize;
+  const sequelize = Contract.sequelize;
   const transaction = await sequelize.transaction();
 
   try {
     console.log(`Update ${original}`);
-    console.log(updatedHRDocument.document.authorId);
 
     const updatedDocument = await Document.update({
-      number: updatedHRDocument.document.number,
-      subject: updatedHRDocument.document.subject,
-      body: updatedHRDocument.document.body,
-      duration: updatedHRDocument.document.duration,
-      authorId: updatedHRDocument.document.authorId,
+      number: updatedContract.document.number,
+      subject: updatedContract.document.subject,
+      body: updatedContract.document.body,
+      duration: updatedContract.document.duration,
+      authorId: updatedContract.document.authorId,
     }, {
-      where: { id: updatedHRDocument.document.id },
+      where: { id: updatedContract.document.id },
       transaction: transaction 
     });
 
-    const updatedHRDocumentRes = await HRDocument.update({
-      employee_name: updatedHRDocument.employee_name,
-      hrDocumentTypeId: updatedHRDocument.hrDocumentTypeId,
-      positionId: updatedHRDocument.positionId,
-      departmentId: updatedHRDocument.department.id,
+    const updatedContractRes = await Contract.update({
+      sum: updatedContract.sum,
+      counterpartyId: updatedContract.counterpartyId,
+      contractTypeId: updatedContract.contractTypeId
     }, {
-      where: { id: updatedHRDocument.id },
+      where: { id: updatedContract.id },
       transaction: transaction 
     });
 
@@ -372,7 +348,7 @@ async function hrDocumentPostUpdate(request, response) {
 
     await transaction.commit();
 
-    response.json(updatedHRDocumentRes);
+    response.json(updatedContractRes);
   } catch (err) {
     await transaction.rollback();
 
@@ -381,8 +357,8 @@ async function hrDocumentPostUpdate(request, response) {
 }
 
 module.exports = { 
-  hrDocumentGet, 
-  hrDocumentPostCreate, 
-  hrDocumentPostDelete, 
-  hrDocumentPostUpdate 
+  contractGet, 
+  contractPostCreate, 
+  contractPostDelete, 
+  contractPostUpdate 
 }

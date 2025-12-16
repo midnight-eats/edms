@@ -16,14 +16,10 @@ const Contract = connection.define("contracts", {
     type: Sequelize.INTEGER,
     allowNull: false
   },
-  notes: {
-    type: Sequelize.TEXT,
+  is_deleted: {
+    type: Sequelize.BOOLEAN,
     allowNull: false,
-    validate: {
-      notEmpty: {
-        msg: 'Notes cannot be empty'
-      }
-    }
+    defaultValue: false
   }}, {
     timestamps: false
   }

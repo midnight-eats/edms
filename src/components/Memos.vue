@@ -21,7 +21,7 @@
             icon="mdi-book-multiple" 
             size="x-small" start>
           </v-icon>
-          Кадровые документы
+          Служебные записки
         </v-toolbar-title>
 
         <v-btn
@@ -449,7 +449,7 @@
   import { cloneDeep, indexOf } from 'lodash';
 
   const headers = [
-    { title: 'Номер', align: 'start', key: 'document.number' },
+    { title: 'ID', align: 'start', key: 'id' },
     { title: 'Тема', align: 'start', key: 'document.subject' },
     { title: 'Автор', align: 'start', key: 'document.author' },
     { title: 'Дата создания', align: 'start', key: 'document.created_at' },
@@ -650,6 +650,7 @@
       Promise.all([axios.post("/api/memos/create", documentModel.value)])
       .then((responses) => { 
         var serverDocument = responses[0].data;
+        serverDocument.document.created_at = new Date(serverDocument.document.created_at);
         documents.value.push(serverDocument);
       });
     }
@@ -762,11 +763,11 @@
       documentModel.value.document.author = user;
       documentModel.value.document.authorId = user.id;
     } else if (state.value == 'authormanagerid') {
-      documentModel.value.document.authorManager = user;
-      documentModel.value.document.authorManagerId = user.id;
+      documentModel.value.authorManager = user;
+      documentModel.value.authorManagerId = user.id;
     } else if (state.value == 'signatory') {
-      documentModel.value.document.signatory = user;
-      documentModel.value.document.signatoryId = user.id;
+      documentModel.value.signatory = user;
+      documentModel.value.signatoryId = user.id;
     }
 
     state.value = '';

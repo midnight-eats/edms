@@ -14,8 +14,10 @@ const { hrDocumentRouter } = require("./routers/hrDocumentRouter.js");
 const { memoTypeRouter } = require("./routers/memoTypeRouter.js");
 const { memoRouter } = require("./routers/memoRouter.js");
 const { contractTypeRouter } = require("./routers/contractTypeRouter.js");
+const { contractRouter } = require("./routers/contractRouter.js");
 const { administrativeDocumentTypeRouter } = require("./routers/administrativeDocumentTypeRouter.js");
 const { deliveryMethodRouter } = require("./routers/deliveryMethodRouter.js");
+const { counterpartyRouter } = require("./routers/counterpartyRouter.js");
 
 app.use("/api/positions/", positionRouter);
 app.use("/api/categories/", categoryRouter);
@@ -28,8 +30,10 @@ app.use("/api/memos/", memoRouter);
 app.use("/api/hr-document-types/", hrDocumentTypeRouter);
 app.use("/api/hr-documents/", hrDocumentRouter);
 app.use("/api/contract-types/", contractTypeRouter);
+app.use("/api/contracts/", contractRouter);
 app.use("/api/administrative-document-types/", administrativeDocumentTypeRouter);
 app.use("/api/delivery-methods/", deliveryMethodRouter);
+app.use("/api/counterparties/", counterpartyRouter);
    
 app.use("/about", function (request, response) {
     response.send("О сайте");
