@@ -19,6 +19,7 @@ import Memos from '@/components/Memos.vue'
 import ContractTypes from '@/components/ContractTypes.vue'
 import Contracts from '@/components/Contracts.vue'
 import AdministrativeDocumentTypes from '@/components/AdministrativeDocumentTypes.vue'
+import AdministrativeDocuments from '@/components/AdministrativeDocuments.vue'
 import DeliveryMethods from '@/components/DeliveryMethods.vue'
 import Counterparties from '@/components/Counterparties.vue'
 import index from '@/pages/index.vue';
@@ -38,6 +39,7 @@ const routes = [
   { path: '/contract-types', component: ContractTypes },
   { path: '/contracts', component: Contracts },
   { path: '/administrative-document-types', component: AdministrativeDocumentTypes },
+  { path: '/administrative-documents', component: AdministrativeDocuments },
   { path: '/delivery-methods', component: DeliveryMethods },
   { path: '/counterparties', component: Counterparties }
   //{ path: '/profile', component: ProfileView },
