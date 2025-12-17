@@ -23,6 +23,7 @@ import AdministrativeDocuments from '@/components/AdministrativeDocuments.vue'
 import DeliveryMethods from '@/components/DeliveryMethods.vue'
 import Counterparties from '@/components/Counterparties.vue'
 import OutgoingCorrespondences from '@/components/OutgoingCorrespondences.vue'
+import IncomingCorrespondences from '@/components/IncomingCorrespondences.vue'
 import index from '@/pages/index.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
@@ -43,7 +44,8 @@ const routes = [
   { path: '/administrative-documents', component: AdministrativeDocuments },
   { path: '/delivery-methods', component: DeliveryMethods },
   { path: '/counterparties', component: Counterparties },
-  { path: '/outgoing-correspondences', component: OutgoingCorrespondences }
+  { path: '/outgoing-correspondences', component: OutgoingCorrespondences },
+  { path: '/incoming-correspondences', component: IncomingCorrespondences }
   //{ path: '/profile', component: ProfileView },
 ];
 

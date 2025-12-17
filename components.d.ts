@@ -27,6 +27,7 @@ declare module 'vue' {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     HRDocuments: typeof import('./src/components/HRDocuments.vue')['default']
     HRDocumentTypes: typeof import('./src/components/HRDocumentTypes.vue')['default']
+    IncomingCorrespondences: typeof import('./src/components/IncomingCorrespondences.vue')['default']
     Memos: typeof import('./src/components/Memos.vue')['default']
     MemoTypes: typeof import('./src/components/MemoTypes.vue')['default']
     OneFieldDataTable: typeof import('./src/components/OneFieldDataTable.vue')['default']

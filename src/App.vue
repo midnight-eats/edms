@@ -10,6 +10,7 @@
         <v-list-item prepend-icon="mdi-file-sign" title="Договоры" to="/contracts"></v-list-item>
         <v-list-item prepend-icon="mdi-order-bool-descending-variant" title="ОРД" to="/administrative-documents"></v-list-item>
         <v-list-item prepend-icon="mdi-email-arrow-right" title="Исходящие корреспонденции" to="/outgoing-correspondences"></v-list-item>
+        <v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/incoming-correspondences"></v-list-item>
         <v-list-item prepend-icon="mdi-file-document-multiple-outline" title="Виды кадрового документа" to="/hr-document-types"></v-list-item>
         <v-list-item prepend-icon="mdi-file-document-multiple-outline" title="Типы служебной записки" to="/memo-types"></v-list-item>
         <v-list-item prepend-icon="mdi-file-document-multiple-outline" title="Типы договора" to="/contract-types"></v-list-item>
