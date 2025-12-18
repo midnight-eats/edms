@@ -28,6 +28,7 @@ declare module 'vue' {
     HRDocuments: typeof import('./src/components/HRDocuments.vue')['default']
     HRDocumentTypes: typeof import('./src/components/HRDocumentTypes.vue')['default']
     IncomingCorrespondences: typeof import('./src/components/IncomingCorrespondences.vue')['default']
+    InternalDocuments: typeof import('./src/components/InternalDocuments.vue')['default']
     InternalDocumentTypes: typeof import('./src/components/InternalDocumentTypes.vue')['default']
     Memos: typeof import('./src/components/Memos.vue')['default']
     MemoTypes: typeof import('./src/components/MemoTypes.vue')['default']

@@ -10,7 +10,7 @@
               v-bind="props"
               prepend-icon="mdi-file-document-multiple-outline"
               title="Документы"
-            ></v-list-item>          
+            ></v-list-item>       
           </template>
           <v-list-item prepend-icon="mdi-file-document-multiple" title="Кадровые документы" to="/hr-documents"></v-list-item>
           <v-list-item prepend-icon="mdi-note-edit-outline" title="Служебные записки" to="/memos"></v-list-item>

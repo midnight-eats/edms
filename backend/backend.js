@@ -22,6 +22,7 @@ const { counterpartyRouter } = require("./routers/counterpartyRouter.js");
 const { outgoingCorrespondenceRouter } = require("./routers/outgoingCorrespondenceRouter.js");
 const { incomingCorrespondenceRouter } = require("./routers/incomingCorrespondenceRouter.js");
 const { internalDocumentTypeRouter } = require("./routers/internalDocumentTypeRouter.js");
+const { internalDocumentRouter } = require("./routers/internalDocumentRouter.js");
 
 app.use("/api/positions/", positionRouter);
 app.use("/api/categories/", categoryRouter);
@@ -42,6 +43,7 @@ app.use("/api/counterparties/", counterpartyRouter);
 app.use("/api/outgoing-correspondences/", outgoingCorrespondenceRouter);
 app.use("/api/incoming-correspondences/", incomingCorrespondenceRouter);
 app.use("/api/internal-document-types/", internalDocumentTypeRouter);
+app.use("/api/internal-documents/", internalDocumentRouter);
    
 app.use("/about", function (request, response) {
     response.send("О сайте");

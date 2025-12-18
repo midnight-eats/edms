@@ -25,6 +25,7 @@ import Counterparties from '@/components/Counterparties.vue'
 import OutgoingCorrespondences from '@/components/OutgoingCorrespondences.vue'
 import IncomingCorrespondences from '@/components/IncomingCorrespondences.vue'
 import InternalDocumentTypes from '@/components/InternalDocumentTypes.vue'
+import InternalDocuments from '@/components/InternalDocuments.vue'
 import index from '@/pages/index.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
@@ -47,7 +48,8 @@ const routes = [
   { path: '/counterparties', component: Counterparties },
   { path: '/outgoing-correspondences', component: OutgoingCorrespondences },
   { path: '/incoming-correspondences', component: IncomingCorrespondences },
-  { path: '/internal-document-types', component: InternalDocumentTypes }
+  { path: '/internal-document-types', component: InternalDocumentTypes },
+  { path: '/internal-documents', component: InternalDocuments }
   //{ path: '/profile', component: ProfileView },
 ];
 
