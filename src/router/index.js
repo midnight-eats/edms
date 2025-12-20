@@ -26,30 +26,32 @@ import OutgoingCorrespondences from '@/components/OutgoingCorrespondences.vue'
 import IncomingCorrespondences from '@/components/IncomingCorrespondences.vue'
 import InternalDocumentTypes from '@/components/InternalDocumentTypes.vue'
 import InternalDocuments from '@/components/InternalDocuments.vue'
+import LoginForm from '@/components/LoginForm.vue'
 import index from '@/pages/index.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
 const routes = [
-  { path: '/', component: HelloWorld},
-  { path: '/users', component: Users },
-  { path: '/departments', component: Departments },
-  { path: '/positions', component: Positions },
-  { path: '/categories', component: Categories },
-  { path: '/documents', component: Documents },
-  { path: '/hr-document-types', component: HRDocumentTypes },
-  { path: '/hr-documents', component: HRDocuments },
-  { path: '/memo-types', component: MemoTypes },
-  { path: '/memos', component: Memos },
-  { path: '/contract-types', component: ContractTypes },
-  { path: '/contracts', component: Contracts },
-  { path: '/administrative-document-types', component: AdministrativeDocumentTypes },
-  { path: '/administrative-documents', component: AdministrativeDocuments },
-  { path: '/delivery-methods', component: DeliveryMethods },
-  { path: '/counterparties', component: Counterparties },
-  { path: '/outgoing-correspondences', component: OutgoingCorrespondences },
-  { path: '/incoming-correspondences', component: IncomingCorrespondences },
-  { path: '/internal-document-types', component: InternalDocumentTypes },
-  { path: '/internal-documents', component: InternalDocuments }
+  { path: '/', component: HelloWorld, meta: { requiresAuth: true }},
+  { path: '/users', component: Users, meta: { requiresAuth: true } },
+  { path: '/departments', component: Departments, meta: { requiresAuth: true } },
+  { path: '/positions', component: Positions, meta: { requiresAuth: true } },
+  { path: '/categories', component: Categories, meta: { requiresAuth: true } },
+  { path: '/documents', component: Documents, meta: { requiresAuth: true } },
+  { path: '/hr-document-types', component: HRDocumentTypes, meta: { requiresAuth: true } },
+  { path: '/hr-documents', component: HRDocuments, meta: { requiresAuth: true } },
+  { path: '/memo-types', component: MemoTypes, meta: { requiresAuth: true } },
+  { path: '/memos', component: Memos, meta: { requiresAuth: true } },
+  { path: '/contract-types', component: ContractTypes, meta: { requiresAuth: true } },
+  { path: '/contracts', component: Contracts, meta: { requiresAuth: true } },
+  { path: '/administrative-document-types', component: AdministrativeDocumentTypes, meta: { requiresAuth: true } },
+  { path: '/administrative-documents', component: AdministrativeDocuments, meta: { requiresAuth: true } },
+  { path: '/delivery-methods', component: DeliveryMethods, meta: { requiresAuth: true } },
+  { path: '/counterparties', component: Counterparties, meta: { requiresAuth: true } },
+  { path: '/outgoing-correspondences', component: OutgoingCorrespondences, meta: { requiresAuth: true } },
+  { path: '/incoming-correspondences', component: IncomingCorrespondences, meta: { requiresAuth: true } },
+  { path: '/internal-document-types', component: InternalDocumentTypes, meta: { requiresAuth: true } },
+  { path: '/internal-documents', component: InternalDocuments, meta: { requiresAuth: true } },
+  { path: '/login', component: LoginForm }
   //{ path: '/profile', component: ProfileView },
 ];
 
@@ -59,6 +61,22 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
+
+router.beforeEach((to, from, next) => {
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  const isAuthenticated = localStorage.getItem('userToken'); // Check if token exists
+  //console.log('yay');
+  console.log(`requireAuth: ${requiresAuth}`);
+  console.log(`isAuthenticated: ${isAuthenticated}`);
+
+  if (requiresAuth && !(isAuthenticated)) {
+    console.log('relogin');
+    // If route requires auth and user is not logged in, redirect to login page
+    next('/login');
+  } else {
+    next(); // Proceed as normal
+  }
+});
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {

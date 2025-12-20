@@ -42,7 +42,7 @@
               v-bind="props"
               prepend-icon="mdi-account-group-outline"
               title="Люди"
-            ></v-list-item>          
+            ></v-list-item>
           </template>
           <v-list-item prepend-icon="mdi-account-group" title="Департаменты и пользователи" to="/departments"></v-list-item>
           <v-list-item prepend-icon="mdi-badge-account-outline" title="Должности" to="/positions"></v-list-item>
@@ -50,13 +50,19 @@
         </v-list-group>
         
           <v-list-item prepend-icon="mdi-truck-fast" title="Способы доставки" to="/delivery-methods"></v-list-item>
-          <v-list-item prepend-icon="mdi-account" title="Категории" to="/categories"></v-list-item>
+          <!--v-list-item prepend-icon="mdi-account" title="Категории" to="/categories"></v-list-item-->
       </v-list>
     </v-navigation-drawer>
 
-    <v-app-bar app>
+    <v-app-bar app v-model="appbar">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>EDMS</v-toolbar-title>
+      <v-btn 
+        text="Выйти"
+        href="/login"
+        @click='logOut()'
+        >
+      </v-btn>
     </v-app-bar>
 
     <v-main>
@@ -68,7 +74,60 @@
   </v-app>
 </template>
 
-<script setup>
+<script>
+
   import { ref } from 'vue';
-  const drawer = ref(null);
+
+export default 
+{
+  name: "sidebar",
+
+  data() 
+  {
+    console.log("DATA");
+    
+    return  {
+      drawer: ref(true),
+      appbar: ref(true),
+
+    };
+  },
+  mounted() 
+  { 
+
+    this.emitter.on("loggedin", () => this.showAll());
+    this.emitter.on("loggedout", () => this.hideAll());
+
+    //this.emitter.on("toggle-sidebar", isOpen => {
+    //  this.isOpen = isOpen;
+    console.log("MOUNTED");
+
+  },
+  setup()
+  {
+    //drawer.value = false
+    console.log("SETUP");
+    //this.drawer.value = false;    
+  },
+  methods:
+  {
+    showAll() {
+      console.log("LOGINED!!!");
+      this.drawer = true;
+      this.appbar = true;
+    },
+
+    hideAll() {
+      console.log("LOGGED OUT!!!");
+      this.drawer = false;
+      this.appbar = false;
+    },
+
+    logOut() {
+      localStorage.removeItem('userToken');
+    }
+  }
+
+
+}
 </script>

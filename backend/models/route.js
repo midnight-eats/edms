@@ -20,6 +20,11 @@ const Route = connection.define("routes", {
       }
     }
   },
+  curr_step: {
+    type: Sequelize.STRING(100),
+    allowNull: false,
+    defaultValue: 1
+  },
   is_deleted: {
     type: Sequelize.BOOLEAN,
     allowNull: false,

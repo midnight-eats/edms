@@ -30,6 +30,7 @@ declare module 'vue' {
     IncomingCorrespondences: typeof import('./src/components/IncomingCorrespondences.vue')['default']
     InternalDocuments: typeof import('./src/components/InternalDocuments.vue')['default']
     InternalDocumentTypes: typeof import('./src/components/InternalDocumentTypes.vue')['default']
+    LoginForm: typeof import('./src/components/LoginForm.vue')['default']
     Memos: typeof import('./src/components/Memos.vue')['default']
     MemoTypes: typeof import('./src/components/MemoTypes.vue')['default']
     OneFieldDataTable: typeof import('./src/components/OneFieldDataTable.vue')['default']

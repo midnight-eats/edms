@@ -8,16 +8,19 @@
 import { registerPlugins } from '@/plugins'
 
 // Components
-import App from './App.vue'
+import App from './App.vue';
+import mitt from 'mitt';
+const emitter = mitt();
 
 // Composables
-import { createApp } from 'vue'
+import { createApp } from 'vue';
 
 // Styles
-import 'unfonts.css'
+import 'unfonts.css';
 
-const app = createApp(App)
+const app = createApp(App);
+app.config.globalProperties.emitter = emitter;
 
-registerPlugins(app)
+registerPlugins(app);
 
-app.mount('#app')
+app.mount('#app');

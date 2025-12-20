@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
-
 app.use(express.json());
 
+const { authRouter } = require('./authApi.js');
 const { positionRouter } = require("./routers/positionRouter.js");
 const { categoryRouter } = require("./categoryRouter.js");
 const { userRouter } = require("./routers/userRouter.js");
@@ -44,6 +44,7 @@ app.use("/api/outgoing-correspondences/", outgoingCorrespondenceRouter);
 app.use("/api/incoming-correspondences/", incomingCorrespondenceRouter);
 app.use("/api/internal-document-types/", internalDocumentTypeRouter);
 app.use("/api/internal-documents/", internalDocumentRouter);
+app.use("/api/", authRouter);
    
 app.use("/about", function (request, response) {
     response.send("О сайте");
