@@ -27,6 +27,7 @@ import IncomingCorrespondences from '@/components/IncomingCorrespondences.vue'
 import InternalDocumentTypes from '@/components/InternalDocumentTypes.vue'
 import InternalDocuments from '@/components/InternalDocuments.vue'
 import LoginForm from '@/components/LoginForm.vue'
+import ActiveHRDocuments from '@/components/ActiveHRDocuments.vue'
 import index from '@/pages/index.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
@@ -51,6 +52,7 @@ const routes = [
   { path: '/incoming-correspondences', component: IncomingCorrespondences, meta: { requiresAuth: true } },
   { path: '/internal-document-types', component: InternalDocumentTypes, meta: { requiresAuth: true } },
   { path: '/internal-documents', component: InternalDocuments, meta: { requiresAuth: true } },
+  { path: '/active/hr-documents', component: ActiveHRDocuments, meta: { requiresAuth: true } },
   { path: '/login', component: LoginForm }
   //{ path: '/profile', component: ProfileView },
 ];

@@ -33,7 +33,7 @@ const HRDocument = connection.define("hr_documents", {
 
 HRDocument.belongsTo(Document, { as: 'document' });
 HRDocument.belongsTo(HRDocumentType, { as: 'hrDocumentType' });
-HRDocument.belongsTo(Position);
+HRDocument.belongsTo(Position, { as: 'position' });
 HRDocument.belongsTo(Department, { as: 'department' });
 
 connection.sync({force: false, alter: true}).then(result => {

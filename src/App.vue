@@ -3,7 +3,40 @@
   <v-locale-provider locale="ru">
     <v-navigation-drawer width='400' app v-model="drawer">
       <v-list nav dense>
-        <v-list-item prepend-icon="mdi-home" title="Home" to="/"></v-list-item>
+        <!--v-list-item prepend-icon="mdi-home" title="Home" to="/"></v-list-item-->
+        <v-list-item prepend-icon="mdi-home" title="Домашняя страница" to="/"></v-list-item>
+        <v-list-group value="activeDocuments">
+          <template v-slot:activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              prepend-icon="mdi-file-document-multiple-outline"
+              title="Активные"
+            ></v-list-item>       
+          </template>
+          <v-list-item prepend-icon="mdi-file-document-multiple" title="Кадровые документы" to="/active/hr-documents"></v-list-item>
+          <!--v-list-item prepend-icon="mdi-note-edit-outline" title="Служебные записки" to="/memos"></v-list-item>
+          <v-list-item prepend-icon="mdi-file-sign" title="Договоры" to="/contracts"></v-list-item>
+          <v-list-item prepend-icon="mdi-order-bool-descending-variant" title="ОРД" to="/administrative-documents"></v-list-item>
+          <v-list-item prepend-icon="mdi-email-arrow-right" title="Исходящие корреспонденции" to="/outgoing-correspondences"></v-list-item>
+          <v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/incoming-correspondences"></v-list-item>
+          <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item-->
+        </v-list-group>
+        <v-list-group value="archivedDocuments">
+          <template v-slot:activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              prepend-icon="mdi-file-document-multiple-outline"
+              title="Архив"
+            ></v-list-item>       
+          </template>
+          <v-list-item prepend-icon="mdi-file-document-multiple" title="Кадровые документы" to="/archived/hr-documents"></v-list-item>
+          <!--v-list-item prepend-icon="mdi-note-edit-outline" title="Служебные записки" to="/memos"></v-list-item>
+          <v-list-item prepend-icon="mdi-file-sign" title="Договоры" to="/contracts"></v-list-item>
+          <v-list-item prepend-icon="mdi-order-bool-descending-variant" title="ОРД" to="/administrative-documents"></v-list-item>
+          <v-list-item prepend-icon="mdi-email-arrow-right" title="Исходящие корреспонденции" to="/outgoing-correspondences"></v-list-item>
+          <v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/incoming-correspondences"></v-list-item>
+          <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item-->
+        </v-list-group>
         <v-list-group value="documents">
           <template v-slot:activator="{ props }">
             <v-list-item
@@ -85,7 +118,7 @@ export default
   data() 
   {
     console.log("DATA");
-    
+
     return  {
       drawer: ref(true),
       appbar: ref(true),

@@ -23,6 +23,7 @@ const { outgoingCorrespondenceRouter } = require("./routers/outgoingCorresponden
 const { incomingCorrespondenceRouter } = require("./routers/incomingCorrespondenceRouter.js");
 const { internalDocumentTypeRouter } = require("./routers/internalDocumentTypeRouter.js");
 const { internalDocumentRouter } = require("./routers/internalDocumentRouter.js");
+const { activeHRDocumentRouter } = require("./routers/activeHRDocumentRouter.js");
 
 app.use("/api/positions/", positionRouter);
 app.use("/api/categories/", categoryRouter);
@@ -45,6 +46,7 @@ app.use("/api/incoming-correspondences/", incomingCorrespondenceRouter);
 app.use("/api/internal-document-types/", internalDocumentTypeRouter);
 app.use("/api/internal-documents/", internalDocumentRouter);
 app.use("/api/", authRouter);
+app.use("/api/active/hr-documents/", activeHRDocumentRouter);
    
 app.use("/about", function (request, response) {
     response.send("О сайте");

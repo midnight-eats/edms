@@ -3,7 +3,7 @@ const { Sequelize } = require('sequelize');
 const connection = Connection.getConnection();
 const { Position } = require("./position.js");
 const { Department } = require("./department.js");
-const { ROLES } = require("../constants.js");;
+const { ROLES } = require("../constants.js");
 
 const User = connection.define("users", {
   id: {

@@ -1,6 +1,7 @@
 const Connection = require("../connection.js")
 const { Sequelize } = require('sequelize');
 const { User } = require("./user.js");
+const { STATUSES } = require("../constants.js");
 const connection = Connection.getConnection();
 
 const Document = connection.define("documents", {
@@ -10,30 +11,28 @@ const Document = connection.define("documents", {
     primaryKey: true,
     allowNull: false
   },
-  number: {
-    type: Sequelize.STRING,
-    allowNull: false,
-    defaultValue: '0',
-    validate: {
-      notEmpty: {
-        msg: 'Number cannot be empty'
-      }
-    }
-  },
   subject: {
     type: Sequelize.STRING,
     allowNull: false,
-    defaultValue: '1',
     validate: {
       notEmpty: {
         msg: 'Subject cannot be empty'
       }
     }
   },
+  status: {
+    type: Sequelize.ENUM(STATUSES),
+    allowNull: false,
+    defaultValue: STATUSES[0],
+    validate: {
+      notEmpty: {
+        msg: 'Role cannot be empty'
+      }
+    }
+  },
   body: {
     type: Sequelize.TEXT,
     allowNull: false,
-    defaultValue: '1',
     validate: {
       notEmpty: {
         msg: 'Body cannot be empty'

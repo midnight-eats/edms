@@ -21,7 +21,7 @@ const Route = connection.define("routes", {
     }
   },
   curr_step: {
-    type: Sequelize.STRING(100),
+    type: Sequelize.SMALLINT,
     allowNull: false,
     defaultValue: 1
   },
