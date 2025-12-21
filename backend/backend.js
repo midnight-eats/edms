@@ -24,6 +24,7 @@ const { incomingCorrespondenceRouter } = require("./routers/incomingCorresponden
 const { internalDocumentTypeRouter } = require("./routers/internalDocumentTypeRouter.js");
 const { internalDocumentRouter } = require("./routers/internalDocumentRouter.js");
 const { activeHRDocumentRouter } = require("./routers/activeHRDocumentRouter.js");
+const { archivedHRDocumentRouter } = require("./routers/archivedHRDocumentRouter.js");
 
 app.use("/api/positions/", positionRouter);
 app.use("/api/categories/", categoryRouter);
@@ -47,6 +48,7 @@ app.use("/api/internal-document-types/", internalDocumentTypeRouter);
 app.use("/api/internal-documents/", internalDocumentRouter);
 app.use("/api/", authRouter);
 app.use("/api/active/hr-documents/", activeHRDocumentRouter);
+app.use("/api/archived/hr-documents/", archivedHRDocumentRouter);
    
 app.use("/about", function (request, response) {
     response.send("О сайте");
