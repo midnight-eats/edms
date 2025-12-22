@@ -33,6 +33,8 @@ import ActiveMemos from '@/components/ActiveMemos.vue'
 import ArchivedMemos from '@/components/ArchivedMemos.vue'
 import ActiveContracts from '@/components/ActiveContracts.vue'
 import ArchivedContracts from '@/components/ArchivedContracts.vue'
+import ActiveAdministrativeDocuments from '@/components/ActiveAdministrativeDocuments.vue'
+import ArchivedAdministrativeDocuments from '@/components/ArchivedAdministrativeDocuments.vue'
 import index from '@/pages/index.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
@@ -63,6 +65,8 @@ const routes = [
   { path: '/archived/memos', component: ArchivedMemos, meta: { requiresAuth: true } },
   { path: '/active/contracts', component: ActiveContracts, meta: { requiresAuth: true } },
   { path: '/archived/contracts', component: ArchivedContracts, meta: { requiresAuth: true } },
+  { path: '/active/administrative-documents', component: ActiveAdministrativeDocuments, meta: { requiresAuth: true } },
+  { path: '/archived/administrative-documents', component: ArchivedAdministrativeDocuments, meta: { requiresAuth: true } },
   { path: '/login', component: LoginForm }
   //{ path: '/profile', component: ProfileView },
 ];

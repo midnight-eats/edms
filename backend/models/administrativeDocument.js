@@ -21,8 +21,8 @@ const AdministrativeDocument = connection.define("administrative_documents", {
   }
 );
 
-AdministrativeDocument.belongsTo(Document);
-AdministrativeDocument.belongsTo(AdministrativeDocumentType);
+AdministrativeDocument.belongsTo(Document, { as: 'document' });
+AdministrativeDocument.belongsTo(AdministrativeDocumentType, { as: 'administrativeDocumentType' });
 AdministrativeDocument.belongsTo(User, { as: 'forExecution' });
 AdministrativeDocument.belongsTo(User, { as: 'forFamiliarization' });
 AdministrativeDocument.belongsTo(User, { as: 'supervisor' });
