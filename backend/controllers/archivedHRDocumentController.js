@@ -11,7 +11,7 @@ const { hr } = require("vuetify/locale");
 const { HRDocumentType } = require("../models/hrDocumentType.js");
 
 async function archivedHRDocumentGet(request, response) {
-  const id = 2;
+  const id = request.user.id;
 
   console.log('start');
 
@@ -29,9 +29,6 @@ async function archivedHRDocumentGet(request, response) {
   let documents = [];
 
   for (const routeStageUser of routeStageUsers) {
-    if (!routeStageUser.result)
-      continue;
-
     const routeStage = await RouteStage.findOne({
       where: {
         id: routeStageUser.routeStageId,
@@ -52,7 +49,7 @@ async function archivedHRDocumentGet(request, response) {
     if (!route)
       continue;
     
-    console.log('r done');
+    //console.log('r done');
 
     const hrDocument = await HRDocument.findOne({ 
       where: {

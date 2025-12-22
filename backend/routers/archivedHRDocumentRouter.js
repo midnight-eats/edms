@@ -5,7 +5,7 @@ const { archivedHRDocumentGet } = require('../controllers/archivedHRDocumentCont
 
 const archivedHRDocumentRouter = express.Router();
 const jwt = require("jsonwebtoken");
-/*
+
 archivedHRDocumentRouter.use((req, res, next) => {
   console.log("!!!!!!!!!!!!!!!!!");
   const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -22,7 +22,7 @@ archivedHRDocumentRouter.use((req, res, next) => {
   } catch (err) {
     res.status(401).json({ message: 'Token is not valid' });
   }
-});*/
+});
 
 archivedHRDocumentRouter.get("/", archivedHRDocumentGet);
 

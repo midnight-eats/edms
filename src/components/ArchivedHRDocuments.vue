@@ -172,6 +172,9 @@
           doc.document.end_date = endDate;
         }
       };
+
+      const user = localStorage.getItem('userToken');
+      console.log(user);
     });
   }
 

@@ -11,7 +11,7 @@ const { hr } = require("vuetify/locale");
 const { HRDocumentType } = require("../models/hrDocumentType.js");
 
 async function activeHRDocumentGet(request, response) {
-  const id = 2;
+  const id = request.user.id;
 
   console.log('start');
 
