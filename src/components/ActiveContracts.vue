@@ -20,12 +20,12 @@
     <template v-slot:top>
       <v-toolbar flat>
         <v-toolbar-title>
-          <v-icon 
+          <v-icon
             color="medium-emphasis" 
             icon="mdi-book-multiple" 
             size="x-small" start>
           </v-icon>
-          Кадровые документы
+          Договоры
         </v-toolbar-title>
       </v-toolbar>
     </template>
@@ -51,6 +51,7 @@
         <v-col cols="12">
           <v-autocomplete
             label="Автор"
+            :items="users"
             item-title="name"
             item-value="id"
             v-model="documentModel.document.author"
@@ -63,10 +64,10 @@
         <v-col cols="12">
           <v-select
             label="Тип документа"
+            readonly
             item-title="name"
             item-value="id"
-            v-model="documentModel.hrDocumentType"
-            readonly
+            v-model="documentModel.contractType"
           ></v-select>
         </v-col>
       </v-row>
@@ -105,34 +106,26 @@
       </v-row>
       <v-row>
         <v-col cols="12">
-          <v-text-field 
-            v-model="documentModel.employee_name"
-            label="ФИО сотрудника"
-            required
-            readonly
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
           <v-select
-            label="Должность"
+            label="Контрагент"
             item-title="name"
             item-value="id"
-            v-model="documentModel.position"
+            v-model="documentModel.counterparty"
             readonly
           ></v-select>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12">
-          <v-autocomplete
-            label="Подразделение"
-            item-title="name"
-            item-value="id"
-            v-model="documentModel.department"
+          <v-number-input
+            v-model="documentModel.sum"
+            :reverse="false"
+            controlVariant="default"
+            label="Сумма"
+            :hideInput="false"
+            :inset="false"
             readonly
-          ></v-autocomplete>
+          ></v-number-input>
         </v-col>
       </v-row>
     </container>
@@ -169,18 +162,16 @@
     { title: '', key: 'actions', align: 'end', sortable: false },
   ];
 
-  const tab = ref('document');
   const documents = ref([]);
   const documentDialog = shallowRef(false);
   const documentModel = ref(createNewDocument());
 
   function loadData() {
     Promise.all([
-      axios.get('/api/active/hr-documents/')
+      axios.get('/api/active/contracts/')
     ])
     .then((responses) => {
       documents.value = responses[0].data;
-
 
       if (documents.value.length > 0) {
         for (const doc of documents.value) {
@@ -196,7 +187,7 @@
   function createNewDocument () {
     return {
       id: 0,
-      employee_name: '',
+      sum: 0,
       document: {
         id: 0,
         authorId: null,
@@ -224,15 +215,11 @@
           userId: 0
         }
       },
-      position: {
+      counterparty: {
         id: 0,
         name: ''
       },
-      department: {
-        id: 0,
-        name: ''
-      },
-      hrDocumentType: {
+      contractType: {
         id: 0,
         name: ''
       }
@@ -245,7 +232,7 @@
   }
 
   async function acceptDocument() {
-    Promise.all([axios.post("/api/active/hr-documents/accept", documentModel.value)])
+    Promise.all([axios.post("/api/active/contracts/accept", documentModel.value)])
     .then((responses) => {           
       const index = documents.value.findIndex(item => item.id === documentModel.value.id);
       documents.value.splice(index, 1);

@@ -21,10 +21,10 @@ const Memo = connection.define("memos", {
   }
 );
 
-Memo.belongsTo(Document);
+Memo.belongsTo(Document, { as: 'document' });
 Memo.belongsTo(User, { as: 'authorManager' });
 Memo.belongsTo(User, { as: 'signatory' });
-Memo.belongsTo(MemoType);
+Memo.belongsTo(MemoType, { as: 'memoType' });
 
 connection.sync({force: false, alter: true}).then(result => {
   console.log(result);

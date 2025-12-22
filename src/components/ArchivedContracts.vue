@@ -25,7 +25,7 @@
             icon="mdi-book-multiple" 
             size="x-small" start>
           </v-icon>
-          Кадровые документы
+          Служебные записки
         </v-toolbar-title>
       </v-toolbar>
     </template>
@@ -51,6 +51,7 @@
           <v-col cols="12">
             <v-autocomplete
               label="Автор"
+              :items="users"
               item-title="name"
               item-value="id"
               v-model="documentModel.document.author"
@@ -63,10 +64,10 @@
           <v-col cols="12">
             <v-select
               label="Тип документа"
+              readonly
               item-title="name"
               item-value="id"
-              v-model="documentModel.hrDocumentType"
-              readonly
+              v-model="documentModel.contractType"
             ></v-select>
           </v-col>
         </v-row>
@@ -105,34 +106,26 @@
         </v-row>
         <v-row>
           <v-col cols="12">
-            <v-text-field 
-              v-model="documentModel.employee_name"
-              label="ФИО сотрудника"
-              required
-              readonly
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12">
             <v-select
-              label="Должность"
+              label="Контрагент"
               item-title="name"
               item-value="id"
-              v-model="documentModel.position"
+              v-model="documentModel.counterparty"
               readonly
             ></v-select>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12">
-            <v-autocomplete
-              label="Подразделение"
-              item-title="name"
-              item-value="id"
-              v-model="documentModel.department"
+            <v-number-input
+              v-model="documentModel.sum"
+              :reverse="false"
+              controlVariant="default"
+              label="Сумма"
+              :hideInput="false"
+              :inset="false"
               readonly
-            ></v-autocomplete>
+            ></v-number-input>
           </v-col>
         </v-row>
       </container>
@@ -159,7 +152,7 @@
 
   function loadData() {
     Promise.all([
-      axios.get('/api/archived/hr-documents/')
+      axios.get('/api/archived/contracts/')
     ])
     .then((responses) => {
       documents.value = responses[0].data;
@@ -178,7 +171,7 @@
   function createNewDocument () {
     return {
       id: 0,
-      employee_name: '',
+      sum: 0,
       document: {
         id: 0,
         authorId: null,
@@ -189,8 +182,7 @@
         subject: '',
         body: '',
         duration: 1,
-        created_at: new Date(),
-        end_date: new Date()
+        created_at: new Date()
       },
       routeStage: {
         id: 0,
@@ -207,15 +199,11 @@
           userId: 0
         }
       },
-      position: {
+      counterparty: {
         id: 0,
         name: ''
       },
-      department: {
-        id: 0,
-        name: ''
-      },
-      hrDocumentType: {
+      contractType: {
         id: 0,
         name: ''
       }

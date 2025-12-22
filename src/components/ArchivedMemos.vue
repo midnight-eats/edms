@@ -25,7 +25,7 @@
             icon="mdi-book-multiple" 
             size="x-small" start>
           </v-icon>
-          Кадровые документы
+          Служебные записки
         </v-toolbar-title>
       </v-toolbar>
     </template>
@@ -65,7 +65,7 @@
               label="Тип документа"
               item-title="name"
               item-value="id"
-              v-model="documentModel.hrDocumentType"
+              v-model="documentModel.memoType"
               readonly
             ></v-select>
           </v-col>
@@ -105,34 +105,26 @@
         </v-row>
         <v-row>
           <v-col cols="12">
-            <v-text-field 
-              v-model="documentModel.employee_name"
-              label="ФИО сотрудника"
-              required
-              readonly
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12">
-            <v-select
-              label="Должность"
+            <v-autocomplete
+              label="Руководитель инциатора"
               item-title="name"
               item-value="id"
-              v-model="documentModel.position"
+              v-model="documentModel.authorManager"
               readonly
-            ></v-select>
+            >
+            </v-autocomplete>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12">
             <v-autocomplete
-              label="Подразделение"
+              label="Подписант"
               item-title="name"
               item-value="id"
-              v-model="documentModel.department"
+              v-model="documentModel.signatory"
               readonly
-            ></v-autocomplete>
+            >
+            </v-autocomplete>
           </v-col>
         </v-row>
       </container>
@@ -159,7 +151,7 @@
 
   function loadData() {
     Promise.all([
-      axios.get('/api/archived/hr-documents/')
+      axios.get('/api/archived/memos/')
     ])
     .then((responses) => {
       documents.value = responses[0].data;
@@ -178,7 +170,6 @@
   function createNewDocument () {
     return {
       id: 0,
-      employee_name: '',
       document: {
         id: 0,
         authorId: null,
@@ -207,15 +198,15 @@
           userId: 0
         }
       },
-      position: {
+      signatory: {
         id: 0,
         name: ''
       },
-      department: {
+      authorManager: {
         id: 0,
         name: ''
       },
-      hrDocumentType: {
+      memoType: {
         id: 0,
         name: ''
       }

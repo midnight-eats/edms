@@ -1,5 +1,5 @@
 const { Document } = require("../models/document.js");
-const { HRDocument } = require("../models/hrDocument.js");
+const { Contract } = require("../models/contract.js");
 const { Department } = require("../models/department.js");
 const { User } = require("../models/user.js");
 const { Position } = require("../models/position.js");
@@ -8,9 +8,10 @@ const { RouteStage } = require("../models/routeStage.js");
 const { RouteStageUser } = require("../models/routeStageUser.js");
 const { STATUSES } = require("../constants.js");
 const { hr } = require("vuetify/locale");
-const { HRDocumentType } = require("../models/hrDocumentType.js");
+const { ContractType } = require("../models/contractType.js");
+const { Counterparty } = require("../models/counterparty.js");
 
-async function archivedHRDocumentGet(request, response) {
+async function archivedContractGet(request, response) {
   const id = request.user.id;
 
   console.log('start');
@@ -51,7 +52,7 @@ async function archivedHRDocumentGet(request, response) {
     
     //console.log('r done');
 
-    const hrDocument = await HRDocument.findOne({ 
+    const contract = await Contract.findOne({ 
       where: {
         documentId: route.documentId,
         is_deleted: false
@@ -74,20 +75,17 @@ async function archivedHRDocumentGet(request, response) {
           attributes: ['id', 'name']
         }]
       }, {
-        model: Department,
-        as: 'department'
+        model: ContractType,
+        as: 'contractType'
       }, {
-        model: HRDocumentType,
-        as: 'hrDocumentType'
-      }, {
-        model: Position,
-        as: 'position',
+        model: Counterparty,
+        as: 'counterparty'
       }]
     });
 
-    if (hrDocument && hrDocument.document) {
-      if (!documents.find(item => item.id == hrDocument.id)) {
-        const documentWithWorkflow = hrDocument.toJSON();
+    if (contract && contract.document) {
+      if (!documents.find(item => item.id == contract.id)) {
+        const documentWithWorkflow = contract.toJSON();
 
         documentWithWorkflow.routeStage = {
           ...routeStage.toJSON(),
@@ -97,13 +95,11 @@ async function archivedHRDocumentGet(request, response) {
         documents.push(documentWithWorkflow);
       }
     }
-
-    console.log(documents.length);
   }
 
   response.json(documents);
 }
 
 module.exports = { 
-  archivedHRDocumentGet
+  archivedContractGet
 }

@@ -29,6 +29,10 @@ import InternalDocuments from '@/components/InternalDocuments.vue'
 import LoginForm from '@/components/LoginForm.vue'
 import ActiveHRDocuments from '@/components/ActiveHRDocuments.vue'
 import ArchivedHRDocuments from '@/components/ArchivedHRDocuments.vue'
+import ActiveMemos from '@/components/ActiveMemos.vue'
+import ArchivedMemos from '@/components/ArchivedMemos.vue'
+import ActiveContracts from '@/components/ActiveContracts.vue'
+import ArchivedContracts from '@/components/ArchivedContracts.vue'
 import index from '@/pages/index.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
@@ -55,6 +59,10 @@ const routes = [
   { path: '/internal-documents', component: InternalDocuments, meta: { requiresAuth: true } },
   { path: '/active/hr-documents', component: ActiveHRDocuments, meta: { requiresAuth: true } },
   { path: '/archived/hr-documents', component: ArchivedHRDocuments, meta: { requiresAuth: true } },
+  { path: '/active/memos', component: ActiveMemos, meta: { requiresAuth: true } },
+  { path: '/archived/memos', component: ArchivedMemos, meta: { requiresAuth: true } },
+  { path: '/active/contracts', component: ActiveContracts, meta: { requiresAuth: true } },
+  { path: '/archived/contracts', component: ArchivedContracts, meta: { requiresAuth: true } },
   { path: '/login', component: LoginForm }
   //{ path: '/profile', component: ProfileView },
 ];

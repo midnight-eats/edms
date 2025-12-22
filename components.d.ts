@@ -11,11 +11,15 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ActiveContracts: typeof import('./src/components/ActiveContracts.vue')['default']
     ActiveHRDocuments: typeof import('./src/components/ActiveHRDocuments.vue')['default']
+    ActiveMemos: typeof import('./src/components/ActiveMemos.vue')['default']
     AdministrativeDocuments: typeof import('./src/components/AdministrativeDocuments.vue')['default']
     AdministrativeDocumentTypes: typeof import('./src/components/AdministrativeDocumentTypes.vue')['default']
     AppFooter: typeof import('./src/components/AppFooter.vue')['default']
+    ArchivedContracts: typeof import('./src/components/ArchivedContracts.vue')['default']
     ArchivedHRDocuments: typeof import('./src/components/ArchivedHRDocuments.vue')['default']
+    ArchivedMemos: typeof import('./src/components/ArchivedMemos.vue')['default']
     Categories: typeof import('./src/components/Categories.vue')['default']
     Contract: typeof import('./src/components/Contract.vue')['default']
     Contracts: typeof import('./src/components/Contracts.vue')['default']

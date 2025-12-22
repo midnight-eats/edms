@@ -1,16 +1,15 @@
 const { Document } = require("../models/document.js");
-const { HRDocument } = require("../models/hrDocument.js");
-const { Department } = require("../models/department.js");
+const { Contract } = require("../models/contract.js");
 const { User } = require("../models/user.js");
 const { Position } = require("../models/position.js");
 const { Route } = require("../models/route.js");
 const { RouteStage } = require("../models/routeStage.js");
 const { RouteStageUser } = require("../models/routeStageUser.js");
 const { STATUSES } = require("../constants.js");
-const { hr } = require("vuetify/locale");
-const { HRDocumentType } = require("../models/hrDocumentType.js");
+const { ContractType } = require("../models/contractType.js");
+const { Counterparty } = require("../models/counterparty.js");
 
-async function activeHRDocumentGet(request, response) {
+async function activeContractGet(request, response) {
   const id = request.user.id;
 
   console.log('start');
@@ -55,7 +54,7 @@ async function activeHRDocumentGet(request, response) {
     
     console.log('r done');
 
-    const hrDocument = await HRDocument.findOne({ 
+    const contract = await Contract.findOne({ 
       where: {
         documentId: route.documentId,
         is_deleted: false
@@ -78,21 +77,18 @@ async function activeHRDocumentGet(request, response) {
           attributes: ['id', 'name']
         }]
       }, {
-        model: Department,
-        as: 'department'
+        model: ContractType,
+        as: 'contractType'
       }, {
-        model: HRDocumentType,
-        as: 'hrDocumentType'
-      }, {
-        model: Position,
-        as: 'position',
+        model: Counterparty,
+        as: 'counterparty'
       }]
     });
 
     console.log('hrdoc done');
 
-    if (hrDocument) {
-      const documentWithWorkflow = hrDocument.toJSON();
+    if (contract) {
+      const documentWithWorkflow = contract.toJSON();
 
       documentWithWorkflow.routeStage = {
         ...routeStage.toJSON(),
@@ -106,26 +102,26 @@ async function activeHRDocumentGet(request, response) {
   response.json(documents);
 }
 
-async function activeHRDocumentPostAccept(request, response) {
-  const hrDocument = request.body;
-  console.log(`hrdoc id: ${hrDocument.id}`);
+async function activeContractPostAccept(request, response) {
+  const contract = request.body;
+  console.log(`hrdoc id: ${contract.id}`);
 
-  const sequelize = HRDocument.sequelize;
+  const sequelize = Contract.sequelize;
   const transaction = await sequelize.transaction();
 
   try {
     await RouteStageUser.update({
       result: true
     }, {
-      where: { id: hrDocument.routeStage.routeStageUser.id },
+      where: { id: contract.routeStage.routeStageUser.id },
       transaction: transaction 
     });
 
-    console.log(`rsu id: ${hrDocument.routeStage.routeStageUser.id}`);
+    console.log(`rsu id: ${contract.routeStage.routeStageUser.id}`);
 
     const routeStageUsers = await RouteStageUser.findAll({
       where: {
-        routeStageId: hrDocument.routeStage.id,
+        routeStageId: contract.routeStage.id,
         is_deleted: false
       },
       transaction: transaction
@@ -140,7 +136,7 @@ async function activeHRDocumentPostAccept(request, response) {
 
     let accepted = false;
     
-    if (hrDocument.routeStage.all_or_one)
+    if (contract.routeStage.all_or_one)
       accepted = res.every(item => item === true);
     else
       accepted = res.some(item => item === true);
@@ -148,42 +144,42 @@ async function activeHRDocumentPostAccept(request, response) {
     if (accepted) {
       const route = await Route.findOne({
         where: {
-          id: hrDocument.routeStage.routeId,
+          id: contract.routeStage.routeId,
           is_deleted: false
         },
         transaction: transaction
       });
 
-      console.log(`r id: ${hrDocument.routeStage.routeId}`);
+      console.log(`r id: ${contract.routeStage.routeId}`);
 
       const nextStep = route.curr_step + 1;
 
       await Route.update({
         curr_step: nextStep
       }, {
-        where: { id: hrDocument.routeStage.routeId },
+        where: { id: contract.routeStage.routeId },
         transaction: transaction 
       });
 
       const routeStages = await RouteStage.findAll({
         where: {
-          routeId: hrDocument.routeStage.routeId,
+          routeId: contract.routeStage.routeId,
           is_deleted: false
         },
         transaction: transaction
       });
 
-      console.log(`rs id: ${hrDocument.routeStage.id}`);
+      console.log(`rs id: ${contract.routeStage.id}`);
 
       if (routeStages.length < nextStep) {
         await Document.update({
           status: STATUSES[1]
         }, {
-          where: { id: hrDocument.document.id },
+          where: { id: contract.document.id },
           transaction: transaction 
         });
 
-        console.log(`doc id: ${hrDocument.document.id}`);
+        console.log(`doc id: ${contract.document.id}`);
       }
     }
 
@@ -198,6 +194,6 @@ async function activeHRDocumentPostAccept(request, response) {
 }
 
 module.exports = { 
-  activeHRDocumentGet,
-  activeHRDocumentPostAccept
+  activeContractGet,
+  activeContractPostAccept
 }

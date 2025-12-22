@@ -1,16 +1,14 @@
 const { Document } = require("../models/document.js");
-const { HRDocument } = require("../models/hrDocument.js");
-const { Department } = require("../models/department.js");
+const { Memo } = require("../models/memo.js");
 const { User } = require("../models/user.js");
 const { Position } = require("../models/position.js");
 const { Route } = require("../models/route.js");
 const { RouteStage } = require("../models/routeStage.js");
 const { RouteStageUser } = require("../models/routeStageUser.js");
 const { STATUSES } = require("../constants.js");
-const { hr } = require("vuetify/locale");
-const { HRDocumentType } = require("../models/hrDocumentType.js");
+const { MemoType } = require("../models/memoType.js");
 
-async function activeHRDocumentGet(request, response) {
+async function activeMemoGet(request, response) {
   const id = request.user.id;
 
   console.log('start');
@@ -55,7 +53,7 @@ async function activeHRDocumentGet(request, response) {
     
     console.log('r done');
 
-    const hrDocument = await HRDocument.findOne({ 
+    const memo = await Memo.findOne({ 
       where: {
         documentId: route.documentId,
         is_deleted: false
@@ -78,21 +76,21 @@ async function activeHRDocumentGet(request, response) {
           attributes: ['id', 'name']
         }]
       }, {
-        model: Department,
-        as: 'department'
+        model: MemoType,
+        as: 'memoType'
       }, {
-        model: HRDocumentType,
-        as: 'hrDocumentType'
+        model: User,
+        as: 'authorManager'
       }, {
-        model: Position,
-        as: 'position',
+        model: User,
+        as: 'signatory'
       }]
     });
 
     console.log('hrdoc done');
 
-    if (hrDocument) {
-      const documentWithWorkflow = hrDocument.toJSON();
+    if (memo) {
+      const documentWithWorkflow = memo.toJSON();
 
       documentWithWorkflow.routeStage = {
         ...routeStage.toJSON(),
@@ -106,26 +104,26 @@ async function activeHRDocumentGet(request, response) {
   response.json(documents);
 }
 
-async function activeHRDocumentPostAccept(request, response) {
-  const hrDocument = request.body;
-  console.log(`hrdoc id: ${hrDocument.id}`);
+async function activeMemoPostAccept(request, response) {
+  const memo = request.body;
+  console.log(`hrdoc id: ${memo.id}`);
 
-  const sequelize = HRDocument.sequelize;
+  const sequelize = Memo.sequelize;
   const transaction = await sequelize.transaction();
 
   try {
     await RouteStageUser.update({
       result: true
     }, {
-      where: { id: hrDocument.routeStage.routeStageUser.id },
+      where: { id: memo.routeStage.routeStageUser.id },
       transaction: transaction 
     });
 
-    console.log(`rsu id: ${hrDocument.routeStage.routeStageUser.id}`);
+    console.log(`rsu id: ${memo.routeStage.routeStageUser.id}`);
 
     const routeStageUsers = await RouteStageUser.findAll({
       where: {
-        routeStageId: hrDocument.routeStage.id,
+        routeStageId: memo.routeStage.id,
         is_deleted: false
       },
       transaction: transaction
@@ -140,7 +138,7 @@ async function activeHRDocumentPostAccept(request, response) {
 
     let accepted = false;
     
-    if (hrDocument.routeStage.all_or_one)
+    if (memo.routeStage.all_or_one)
       accepted = res.every(item => item === true);
     else
       accepted = res.some(item => item === true);
@@ -148,42 +146,42 @@ async function activeHRDocumentPostAccept(request, response) {
     if (accepted) {
       const route = await Route.findOne({
         where: {
-          id: hrDocument.routeStage.routeId,
+          id: memo.routeStage.routeId,
           is_deleted: false
         },
         transaction: transaction
       });
 
-      console.log(`r id: ${hrDocument.routeStage.routeId}`);
+      console.log(`r id: ${memo.routeStage.routeId}`);
 
       const nextStep = route.curr_step + 1;
 
       await Route.update({
         curr_step: nextStep
       }, {
-        where: { id: hrDocument.routeStage.routeId },
+        where: { id: memo.routeStage.routeId },
         transaction: transaction 
       });
 
       const routeStages = await RouteStage.findAll({
         where: {
-          routeId: hrDocument.routeStage.routeId,
+          routeId: memo.routeStage.routeId,
           is_deleted: false
         },
         transaction: transaction
       });
 
-      console.log(`rs id: ${hrDocument.routeStage.id}`);
+      console.log(`rs id: ${memo.routeStage.id}`);
 
       if (routeStages.length < nextStep) {
         await Document.update({
           status: STATUSES[1]
         }, {
-          where: { id: hrDocument.document.id },
+          where: { id: memo.document.id },
           transaction: transaction 
         });
 
-        console.log(`doc id: ${hrDocument.document.id}`);
+        console.log(`doc id: ${memo.document.id}`);
       }
     }
 
@@ -198,6 +196,6 @@ async function activeHRDocumentPostAccept(request, response) {
 }
 
 module.exports = { 
-  activeHRDocumentGet,
-  activeHRDocumentPostAccept
+  activeMemoGet,
+  activeMemoPostAccept
 }

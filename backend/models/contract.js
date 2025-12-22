@@ -25,9 +25,9 @@ const Contract = connection.define("contracts", {
   }
 );
 
-Contract.belongsTo(Document);
-Contract.belongsTo(ContractType);
-Contract.belongsTo(Counterparty);
+Contract.belongsTo(Document, { as: 'document' });
+Contract.belongsTo(ContractType, { as: 'contractType' });
+Contract.belongsTo(Counterparty, { as: 'counterparty' });
 
 connection.sync({force: false, alter: true}).then(result => {
   console.log(result);
