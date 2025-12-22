@@ -37,6 +37,8 @@ import ActiveAdministrativeDocuments from '@/components/ActiveAdministrativeDocu
 import ArchivedAdministrativeDocuments from '@/components/ArchivedAdministrativeDocuments.vue'
 import ActiveOutgoingCorrespondences from '@/components/ActiveOutgoingCorrespondences.vue'
 import ArchivedOutgoingCorrespondences from '@/components/ArchivedOutgoingCorrespondences.vue'
+import ActiveIncomingCorrespondences from '@/components/ActiveIncomingCorrespondences.vue'
+import ArchivedIncomingCorrespondences from '@/components/ArchivedIncomingCorrespondences.vue'
 import index from '@/pages/index.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
@@ -71,6 +73,8 @@ const routes = [
   { path: '/archived/administrative-documents', component: ArchivedAdministrativeDocuments, meta: { requiresAuth: true } },
   { path: '/active/outgoing-correspondences', component: ActiveOutgoingCorrespondences, meta: { requiresAuth: true } },
   { path: '/archived/outgoing-correspondences', component: ArchivedOutgoingCorrespondences, meta: { requiresAuth: true } },
+  { path: '/active/incoming-correspondences', component: ActiveIncomingCorrespondences, meta: { requiresAuth: true } },
+  { path: '/archived/incoming-correspondences', component: ArchivedIncomingCorrespondences, meta: { requiresAuth: true } },
   { path: '/login', component: LoginForm }
   //{ path: '/profile', component: ProfileView },
 ];

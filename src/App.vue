@@ -8,7 +8,7 @@
           <template v-slot:activator="{ props }">
             <v-list-item
               v-bind="props"
-              prepend-icon="mdi-file-document-multiple-outline"
+              prepend-icon="mdi-bell-ring"
               title="Активные"
             ></v-list-item>       
           </template>
@@ -17,14 +17,14 @@
           <v-list-item prepend-icon="mdi-file-sign" title="Договоры" to="/active/contracts"></v-list-item>
           <v-list-item prepend-icon="mdi-order-bool-descending-variant" title="ОРД" to="/active/administrative-documents"></v-list-item>
           <v-list-item prepend-icon="mdi-email-arrow-right" title="Исходящие корреспонденции" to="/active/outgoing-correspondences"></v-list-item>
-          <!--v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/incoming-correspondences"></v-list-item>
-          <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item-->
+          <v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/active/incoming-correspondences"></v-list-item>
+          <!--v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item-->
         </v-list-group>
         <v-list-group value="archivedDocuments">
           <template v-slot:activator="{ props }">
             <v-list-item
               v-bind="props"
-              prepend-icon="mdi-file-document-multiple-outline"
+              prepend-icon="mdi-archive"
               title="Архив"
             ></v-list-item>
           </template>
@@ -33,8 +33,8 @@
           <v-list-item prepend-icon="mdi-file-sign" title="Договоры" to="/archived/contracts"></v-list-item>
           <v-list-item prepend-icon="mdi-order-bool-descending-variant" title="ОРД" to="/archived/administrative-documents"></v-list-item>
           <v-list-item prepend-icon="mdi-email-arrow-right" title="Исходящие корреспонденции" to="/archived/outgoing-correspondences"></v-list-item>
-          <!--v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/incoming-correspondences"></v-list-item>
-          <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item-->
+          <v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/archived/incoming-correspondences"></v-list-item>
+          <!--v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item-->
         </v-list-group>
         <v-list-group value="documents">
           <template v-slot:activator="{ props }">

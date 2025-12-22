@@ -166,7 +166,6 @@ async function incomingCorrespondencePostCreate(request, response) {
       documentId: createdDocument.id,
       addresserId: incomingCorrespondence.addresserId,
       addresser_name: incomingCorrespondence.addresser_name,
-      addresseeId: incomingCorrespondence.addresseeId,
       deliveryMethodId: incomingCorrespondence.deliveryMethodId
     }, { 
       transaction: transaction 
@@ -232,7 +231,6 @@ async function incomingCorrespondencePostUpdate(request, response) {
     const updatedIncomingCorrespondenceRes = await IncomingCorrespondence.update({
       addresserId: updatedIncomingCorrespondence.addresserId,
       addresser_name: updatedIncomingCorrespondence.addresser_name,
-      addresseeId: updatedIncomingCorrespondence.addresseeId,
       deliveryMethodId: updatedIncomingCorrespondence.deliveryMethodId
     }, {
       where: { id: updatedIncomingCorrespondence.id },

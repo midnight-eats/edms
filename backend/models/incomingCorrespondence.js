@@ -31,10 +31,9 @@ const IncomingCorrespondence = connection.define("incoming_correspondeces", {
   }
 );
 
-IncomingCorrespondence.belongsTo(Document);
+IncomingCorrespondence.belongsTo(Document, { as: 'document' });
 IncomingCorrespondence.belongsTo(Counterparty, { as: 'addresser' });
-IncomingCorrespondence.belongsTo(DeliveryMethod);
-IncomingCorrespondence.belongsTo(User, { as: 'addressee' });
+IncomingCorrespondence.belongsTo(DeliveryMethod, { as: 'deliveryMethod' });
 
 connection.sync({force: false, alter: true}).then(result => {
   console.log(result);

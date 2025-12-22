@@ -142,20 +142,6 @@
               ></v-select>
             </v-col>
           </v-row>
-          <v-row>
-            <v-col cols="12">
-              <v-autocomplete
-                label="Кому направлено"
-                :items="users"
-                item-title="name"
-                item-value="id"
-                v-model="documentModel.addresseeId"
-                readonly
-                @click="addUser('addressee')"
-              >
-              </v-autocomplete>
-            </v-col>
-          </v-row>
         </container>
       </v-tabs-window-item>
       <v-tabs-window-item value="route">
@@ -535,7 +521,6 @@
   function createNewDocument () {
     return {
       id: 0,
-      addresseeId: null,
       addresser_name: '',
       addresserId: null,
       deliveryMethodId: null,
@@ -619,7 +604,6 @@
 
       documentModel.value = cloneDeep({
         id: tempDocumentModel.value.id,
-        addresseeId: tempDocumentModel.value.addresseeId,
         addresser_name: tempDocumentModel.value.addresser_name,
         addresserId: tempDocumentModel.value.addresserId,
         deliveryMethodId: tempDocumentModel.value.deliveryMethodId, 
@@ -763,8 +747,6 @@
     } else if (state.value == 'author') {
       documentModel.value.document.author = user;
       documentModel.value.document.authorId = user.id;
-    } else if (state.value == 'addressee') {
-      documentModel.value.addresseeId = user.id;
     }
 
     state.value = '';

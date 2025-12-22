@@ -61,17 +61,6 @@
         </v-row>
         <v-row>
           <v-col cols="12">
-            <v-select
-              label="Тип документа"
-              item-title="name"
-              item-value="id"
-              v-model="documentModel.memoType"
-              readonly
-            ></v-select>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12">
             <v-text-field 
               v-model="documentModel.document.subject"
               label="Тема"
@@ -105,26 +94,34 @@
         </v-row>
         <v-row>
           <v-col cols="12">
-            <v-autocomplete
-              label="Руководитель инциатора"
+            <v-select
+              label="Корреспондент"
+              readonly
               item-title="name"
               item-value="id"
-              v-model="documentModel.authorManager"
-              readonly
-            >
-            </v-autocomplete>
+              v-model="documentModel.addresser"
+            ></v-select>
           </v-col>
         </v-row>
         <v-row>
           <v-col cols="12">
-            <v-autocomplete
-              label="Подписант"
+            <v-text-field 
+              v-model="documentModel.addresser_name"
+              label="ФИО отправителя"
+              required
+              readonly
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <v-select
+              label="Способ доставки"
+              readonly
               item-title="name"
               item-value="id"
-              v-model="documentModel.signatory"
-              readonly
-            >
-            </v-autocomplete>
+              v-model="documentModel.deliveryMethod"
+            ></v-select>
           </v-col>
         </v-row>
       </container>
@@ -151,7 +148,7 @@
 
   function loadData() {
     Promise.all([
-      axios.get('/api/archived/outgoing-correspondences/')
+      axios.get('/api/archived/incoming-correspondences/')
     ])
     .then((responses) => {
       documents.value = responses[0].data;
@@ -170,7 +167,7 @@
   function createNewDocument () {
     return {
       id: 0,
-      addressee_name: '',
+      addresser_name: '',
       document: {
         id: 0,
         authorId: null,
@@ -198,19 +195,11 @@
           userId: 0
         }
       },
-      preparedBy: {
-        id: 0,
-        name: ''
-      },
-      supervisor: {
-        id: 0,
-        name: ''
-      },
       deliveryMethod: {
         id: 0,
         name: ''
       },
-      addressee: {
+      addresser: {
         id: 0,
         name: ''
       }
