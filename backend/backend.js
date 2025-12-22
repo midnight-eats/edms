@@ -31,6 +31,8 @@ const { activeContractRouter } = require("./routers/activeContractRouter.js");
 const { archivedContractRouter } = require("./routers/archivedContractRouter.js");
 const { activeAdministrativeDocumentRouter } = require("./routers/activeAdministrativeDocumentRouter.js");
 const { archivedAdministrativeDocumentRouter } = require("./routers/archivedAdministrativeDocumentRouter.js");
+const { activeOutgoingCorrespondenceRouter } = require("./routers/activeOutgoingCorrespondenceRouter.js");
+const { archivedOutgoingCorrespondenceRouter } = require("./routers/archivedOutgoingCorrespondenceRouter.js");
 
 app.use("/api/positions/", positionRouter);
 app.use("/api/categories/", categoryRouter);
@@ -61,6 +63,8 @@ app.use("/api/active/contracts/", activeContractRouter);
 app.use("/api/archived/contracts/", archivedContractRouter);
 app.use("/api/active/administrative-documents/", activeAdministrativeDocumentRouter);
 app.use("/api/archived/administrative-documents/", archivedAdministrativeDocumentRouter);
+app.use("/api/active/outgoing-correspondences/", activeOutgoingCorrespondenceRouter);
+app.use("/api/archived/outgoing-correspondences/", archivedOutgoingCorrespondenceRouter);
    
 app.use("/about", function (request, response) {
     response.send("О сайте");

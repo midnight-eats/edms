@@ -1,15 +1,15 @@
 const { Document } = require("../models/document.js");
-const { AdministrativeDocument } = require("../models/administrativeDocument.js");
+const { OutgoingCorrespondence } = require("../models/outgoingCorrespondence.js");
 const { User } = require("../models/user.js");
 const { Position } = require("../models/position.js");
+const { Counterparty } = require("../models/counterparty.js");
+const { DeliveryMethod } = require("../models/deliveryMethod.js");
 const { Route } = require("../models/route.js");
 const { RouteStage } = require("../models/routeStage.js");
 const { RouteStageUser } = require("../models/routeStageUser.js");
 const { STATUSES } = require("../constants.js");
-const { hr } = require("vuetify/locale");
-const { AdministrativeDocumentType } = require("../models/administrativeDocumentType.js");
 
-async function archivedAdministrativeDocumentGet(request, response) {
+async function archivedOutgoingCorrespondenceGet(request, response) {
   const id = request.user.id;
 
   console.log('start');
@@ -48,7 +48,7 @@ async function archivedAdministrativeDocumentGet(request, response) {
     if (!route)
       continue;
 
-    const administrativeDocument = await AdministrativeDocument.findOne({ 
+    const outgoingCorrespondence = await OutgoingCorrespondence.findOne({ 
       where: {
         documentId: route.documentId,
         is_deleted: false
@@ -71,15 +71,16 @@ async function archivedAdministrativeDocumentGet(request, response) {
           attributes: ['id', 'name']
         }]
       }, {
-        model: AdministrativeDocumentType,
-        as: 'administrativeDocumentType'
-      }, {
         model: User,
-        as: 'forExecution',
+        as: 'preparedBy',
         attributes: ['id', 'name']
       }, {
-        model: User,
-        as: 'forFamiliarization',
+        model: DeliveryMethod,
+        as: 'deliveryMethod',
+        attributes: ['id', 'name']
+      }, {
+        model: Counterparty,
+        as: 'addressee',
         attributes: ['id', 'name']
       }, {
         model: User,
@@ -88,9 +89,9 @@ async function archivedAdministrativeDocumentGet(request, response) {
       }]
     });
 
-    if (administrativeDocument && administrativeDocument.document) {
-      if (!documents.find(item => item.id == administrativeDocument.id)) {
-        const documentWithWorkflow = administrativeDocument.toJSON();
+    if (outgoingCorrespondence && outgoingCorrespondence.document) {
+      if (!documents.find(item => item.id == outgoingCorrespondence.id)) {
+        const documentWithWorkflow = outgoingCorrespondence.toJSON();
 
         documentWithWorkflow.routeStage = {
           ...routeStage.toJSON(),
@@ -100,13 +101,11 @@ async function archivedAdministrativeDocumentGet(request, response) {
         documents.push(documentWithWorkflow);
       }
     }
-
-    console.log(documents.length);
   }
 
   response.json(documents);
 }
 
 module.exports = { 
-  archivedAdministrativeDocumentGet
+  archivedOutgoingCorrespondenceGet
 }

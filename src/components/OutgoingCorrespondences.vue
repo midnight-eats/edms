@@ -159,20 +159,6 @@
           <v-row>
             <v-col cols="12">
               <v-autocomplete
-                label="Зарегистрирован"
-                :items="users"
-                item-title="name"
-                item-value="id"
-                v-model="documentModel.registeredById"
-                readonly
-                @click="addUser('registeredby')"
-              >
-              </v-autocomplete>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12">
-              <v-autocomplete
                 label="Контроль осуществляет"
                 :items="users"
                 item-title="name"
@@ -344,7 +330,7 @@
               :value="true"></v-radio>
             </v-radio-group>
           </v-col>
-        </v-row>    
+        </v-row>
       </container>
 
     <v-divider></v-divider>
@@ -566,8 +552,7 @@
       addresseeId: null,
       addressee_name: '',
       deliveryMethodId: null,
-      preparedById: null, 
-      registeredById: null, 
+      preparedById: null,
       supervisorId: null, 
       document: {
         id: 0,
@@ -652,8 +637,7 @@
         addresseeId: tempDocumentModel.value.addresseeId,
         addressee_name: tempDocumentModel.value.addressee_name,
         deliveryMethodId: tempDocumentModel.value.deliveryMethodId,
-        preparedById: tempDocumentModel.value.preparedById, 
-        registeredById: tempDocumentModel.value.registeredById, 
+        preparedById: tempDocumentModel.value.preparedById,
         supervisorId: tempDocumentModel.value.supervisorId, 
         document: tempDocumentModel.value.document
       });
@@ -797,8 +781,6 @@
       documentModel.value.document.authorId = user.id;
     } else if (state.value == 'preparedby') {
       documentModel.value.preparedById = user.id;
-    } else if (state.value == 'registeredby') {
-      documentModel.value.registeredById = user.id;
     } else if (state.value == 'supervisor') {
       documentModel.value.supervisorId = user.id;
     }

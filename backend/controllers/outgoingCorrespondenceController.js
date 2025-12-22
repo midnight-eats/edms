@@ -167,7 +167,6 @@ async function outgoingCorrespondencePostCreate(request, response) {
       addresseeId: outgoingCorrespondence.addresseeId,
       addressee_name: outgoingCorrespondence.addressee_name,
       preparedById: outgoingCorrespondence.preparedById,
-      registeredById: outgoingCorrespondence.registeredById,
       supervisorId: outgoingCorrespondence.supervisorId,
       deliveryMethodId: outgoingCorrespondence.deliveryMethodId
     }, { 
@@ -235,7 +234,6 @@ async function outgoingCorrespondencePostUpdate(request, response) {
       addresseeId: updatedOutgoingCorrespondence.addresseeId,
       addressee_name: updatedOutgoingCorrespondence.addressee_name,
       preparedById: updatedOutgoingCorrespondence.preparedById,
-      registeredById: updatedOutgoingCorrespondence.registeredById,
       supervisorId: updatedOutgoingCorrespondence.supervisorId,
       deliveryMethodId: updatedOutgoingCorrespondence.deliveryMethodId
     }, {

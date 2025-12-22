@@ -16,8 +16,8 @@
           <v-list-item prepend-icon="mdi-note-edit-outline" title="Служебные записки" to="/active/memos"></v-list-item>
           <v-list-item prepend-icon="mdi-file-sign" title="Договоры" to="/active/contracts"></v-list-item>
           <v-list-item prepend-icon="mdi-order-bool-descending-variant" title="ОРД" to="/active/administrative-documents"></v-list-item>
-          <!--v-list-item prepend-icon="mdi-email-arrow-right" title="Исходящие корреспонденции" to="/outgoing-correspondences"></v-list-item>
-          <v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/incoming-correspondences"></v-list-item>
+          <v-list-item prepend-icon="mdi-email-arrow-right" title="Исходящие корреспонденции" to="/active/outgoing-correspondences"></v-list-item>
+          <!--v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/incoming-correspondences"></v-list-item>
           <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item-->
         </v-list-group>
         <v-list-group value="archivedDocuments">
@@ -26,14 +26,14 @@
               v-bind="props"
               prepend-icon="mdi-file-document-multiple-outline"
               title="Архив"
-            ></v-list-item>       
+            ></v-list-item>
           </template>
           <v-list-item prepend-icon="mdi-file-document-multiple" title="Кадровые документы" to="/archived/hr-documents"></v-list-item>
           <v-list-item prepend-icon="mdi-note-edit-outline" title="Служебные записки" to="/archived/memos"></v-list-item>
           <v-list-item prepend-icon="mdi-file-sign" title="Договоры" to="/archived/contracts"></v-list-item>
           <v-list-item prepend-icon="mdi-order-bool-descending-variant" title="ОРД" to="/archived/administrative-documents"></v-list-item>
-          <!--v-list-item prepend-icon="mdi-email-arrow-right" title="Исходящие корреспонденции" to="/outgoing-correspondences"></v-list-item>
-          <v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/incoming-correspondences"></v-list-item>
+          <v-list-item prepend-icon="mdi-email-arrow-right" title="Исходящие корреспонденции" to="/archived/outgoing-correspondences"></v-list-item>
+          <!--v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/incoming-correspondences"></v-list-item>
           <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item-->
         </v-list-group>
         <v-list-group value="documents">

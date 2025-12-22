@@ -31,11 +31,10 @@ const OutgoingCorrespondence = connection.define("outgoing_correspondeces", {
   }
 );
 
-OutgoingCorrespondence.belongsTo(Document);
+OutgoingCorrespondence.belongsTo(Document, { as: 'document' });
 OutgoingCorrespondence.belongsTo(Counterparty, { as: 'addressee' });
-OutgoingCorrespondence.belongsTo(DeliveryMethod);
+OutgoingCorrespondence.belongsTo(DeliveryMethod, { as: 'deliveryMethod' });
 OutgoingCorrespondence.belongsTo(User, { as: 'preparedBy' });
-OutgoingCorrespondence.belongsTo(User, { as: 'registeredBy' });
 OutgoingCorrespondence.belongsTo(User, { as: 'supervisor' });
 
 connection.sync({force: false, alter: true}).then(result => {

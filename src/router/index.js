@@ -35,6 +35,8 @@ import ActiveContracts from '@/components/ActiveContracts.vue'
 import ArchivedContracts from '@/components/ArchivedContracts.vue'
 import ActiveAdministrativeDocuments from '@/components/ActiveAdministrativeDocuments.vue'
 import ArchivedAdministrativeDocuments from '@/components/ArchivedAdministrativeDocuments.vue'
+import ActiveOutgoingCorrespondences from '@/components/ActiveOutgoingCorrespondences.vue'
+import ArchivedOutgoingCorrespondences from '@/components/ArchivedOutgoingCorrespondences.vue'
 import index from '@/pages/index.vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 
@@ -67,6 +69,8 @@ const routes = [
   { path: '/archived/contracts', component: ArchivedContracts, meta: { requiresAuth: true } },
   { path: '/active/administrative-documents', component: ActiveAdministrativeDocuments, meta: { requiresAuth: true } },
   { path: '/archived/administrative-documents', component: ArchivedAdministrativeDocuments, meta: { requiresAuth: true } },
+  { path: '/active/outgoing-correspondences', component: ActiveOutgoingCorrespondences, meta: { requiresAuth: true } },
+  { path: '/archived/outgoing-correspondences', component: ArchivedOutgoingCorrespondences, meta: { requiresAuth: true } },
   { path: '/login', component: LoginForm }
   //{ path: '/profile', component: ProfileView },
 ];
