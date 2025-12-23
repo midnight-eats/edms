@@ -25,7 +25,7 @@
             icon="mdi-book-multiple" 
             size="x-small" start>
           </v-icon>
-          Входящие корреспонденции
+          Внутренние документы
         </v-toolbar-title>
       </v-toolbar>
     </template>
@@ -57,6 +57,17 @@
             readonly
           >
           </v-autocomplete>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-select
+            label="Тип документа"
+            item-title="name"
+            item-value="id"
+            v-model="documentModel.internalDocumentType"
+            readonly
+          ></v-select>
         </v-col>
       </v-row>
       <v-row>
@@ -94,34 +105,60 @@
       </v-row>
       <v-row>
         <v-col cols="12">
-          <v-select
-            label="Корреспондент"
+          <v-autocomplete
+            label="Для подразделения"
+            item-title="name"
+            item-value="id"
+            v-model="documentModel.addressee"
             readonly
+          ></v-autocomplete>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-autocomplete
+            label="От подразделения"
             item-title="name"
             item-value="id"
             v-model="documentModel.addresser"
-          ></v-select>
+            readonly
+          ></v-autocomplete>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12">
-          <v-text-field 
-            v-model="documentModel.addresser_name"
-            label="ФИО отправителя"
-            required
-            readonly
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col cols="12">
-          <v-select
-            label="Способ доставки"
-            readonly
+          <v-autocomplete
+            label="Для исполнения"
             item-title="name"
             item-value="id"
-            v-model="documentModel.deliveryMethod"
-          ></v-select>
+            v-model="documentModel.forExecution"
+            readonly
+          >
+          </v-autocomplete>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-autocomplete
+            label="Для ознакомления"
+            item-title="name"
+            item-value="id"
+            v-model="documentModel.forFamiliarization"
+            readonly
+          >
+          </v-autocomplete>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col cols="12">
+          <v-autocomplete
+            label="Контроль осуществляет"
+            item-title="name"
+            item-value="id"
+            v-model="documentModel.supervisor"
+            readonly
+          >
+          </v-autocomplete>
         </v-col>
       </v-row>
     </container>
@@ -163,7 +200,7 @@
 
   function loadData() {
     Promise.all([
-      axios.get('/api/active/incoming-correspondences/')
+      axios.get('/api/active/internal-documents/')
     ])
     .then((responses) => {
       documents.value = responses[0].data;
@@ -182,7 +219,6 @@
   function createNewDocument () {
     return {
       id: 0,
-      addresser_name: '',
       document: {
         id: 0,
         authorId: null,
@@ -210,11 +246,27 @@
           userId: 0
         }
       },
-      deliveryMethod: {
+      internalDocumentType: {
         id: 0,
         name: ''
       },
       addresser: {
+        id: 0,
+        name: ''
+      },
+      addressee: {
+        id: 0,
+        name: ''
+      },
+      forFamiliarization: {
+        id: 0,
+        name: ''
+      },
+      forExecution: {
+        id: 0,
+        name: ''
+      },
+      supervisor: {
         id: 0,
         name: ''
       }
@@ -227,7 +279,7 @@
   }
 
   async function acceptDocument() {
-    Promise.all([axios.post("/api/active/incoming-correspondences/accept", documentModel.value)])
+    Promise.all([axios.post("/api/active/internal-documents/accept", documentModel.value)])
     .then((responses) => {           
       const index = documents.value.findIndex(item => item.id === documentModel.value.id);
       documents.value.splice(index, 1);

@@ -21,7 +21,7 @@
             icon="mdi-book-multiple" 
             size="x-small" start>
           </v-icon>
-          ОРД
+          Внутренние документы
         </v-toolbar-title>
 
         <v-btn
@@ -165,7 +165,7 @@
           <v-row>
             <v-col cols="12">
               <v-autocomplete
-                label="Для ознакомпления"
+                label="Для ознакомления"
                 :items="users"
                 item-title="name"
                 item-value="id"

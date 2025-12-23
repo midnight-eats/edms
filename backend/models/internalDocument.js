@@ -22,8 +22,8 @@ const InternalDocument = connection.define("internal_documents", {
   }
 );
 
-InternalDocument.belongsTo(Document);
-InternalDocument.belongsTo(InternalDocumentType);
+InternalDocument.belongsTo(Document, { as: 'document' });
+InternalDocument.belongsTo(InternalDocumentType, { as: 'internalDocumentType' });
 InternalDocument.belongsTo(Department, { as: 'addressee' });
 InternalDocument.belongsTo(Department, { as: 'addresser' });
 InternalDocument.belongsTo(User, { as: 'forExecution' });

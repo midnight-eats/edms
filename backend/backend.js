@@ -35,6 +35,8 @@ const { activeOutgoingCorrespondenceRouter } = require("./routers/activeOutgoing
 const { archivedOutgoingCorrespondenceRouter } = require("./routers/archivedOutgoingCorrespondenceRouter.js");
 const { activeIncomingCorrespondenceRouter } = require("./routers/activeIncomingCorrespondenceRouter.js");
 const { archivedIncomingCorrespondenceRouter } = require("./routers/archivedIncomingCorrespondenceRouter.js");
+const { activeInternalDocumentRouter } = require("./routers/activeInternalDocumentRouter.js");
+const { archivedInternalDocumentRouter } = require("./routers/archivedInternalDocumentRouter.js");
 
 app.use("/api/positions/", positionRouter);
 app.use("/api/categories/", categoryRouter);
@@ -69,6 +71,8 @@ app.use("/api/active/outgoing-correspondences/", activeOutgoingCorrespondenceRou
 app.use("/api/archived/outgoing-correspondences/", archivedOutgoingCorrespondenceRouter);
 app.use("/api/active/incoming-correspondences/", activeIncomingCorrespondenceRouter);
 app.use("/api/archived/incoming-correspondences/", archivedIncomingCorrespondenceRouter);
+app.use("/api/active/internal-documents/", activeInternalDocumentRouter);
+app.use("/api/archived/internal-documents/", archivedInternalDocumentRouter);
    
 app.use("/about", function (request, response) {
     response.send("О сайте");

@@ -9,7 +9,7 @@
             <v-list-item
               v-bind="props"
               prepend-icon="mdi-bell-ring"
-              title="Активные"
+              title="Документы на согласование"
             ></v-list-item>       
           </template>
           <v-list-item prepend-icon="mdi-file-document-multiple" title="Кадровые документы" to="/active/hr-documents"></v-list-item>
@@ -18,7 +18,7 @@
           <v-list-item prepend-icon="mdi-order-bool-descending-variant" title="ОРД" to="/active/administrative-documents"></v-list-item>
           <v-list-item prepend-icon="mdi-email-arrow-right" title="Исходящие корреспонденции" to="/active/outgoing-correspondences"></v-list-item>
           <v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/active/incoming-correspondences"></v-list-item>
-          <!--v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item-->
+          <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/active/internal-documents"></v-list-item>
         </v-list-group>
         <v-list-group value="archivedDocuments">
           <template v-slot:activator="{ props }">
@@ -34,7 +34,7 @@
           <v-list-item prepend-icon="mdi-order-bool-descending-variant" title="ОРД" to="/archived/administrative-documents"></v-list-item>
           <v-list-item prepend-icon="mdi-email-arrow-right" title="Исходящие корреспонденции" to="/archived/outgoing-correspondences"></v-list-item>
           <v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/archived/incoming-correspondences"></v-list-item>
-          <!--v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item-->
+          <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/archived/internal-documents"></v-list-item>
         </v-list-group>
         <v-list-group value="documents">
           <template v-slot:activator="{ props }">
@@ -53,35 +53,25 @@
           <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item>
         </v-list-group>
 
-        <v-list-group value="documentTypes">
-          <template v-slot:activator="{ props }">
-            <v-list-item
-              v-bind="props"
-              prepend-icon="mdi-list-box-outline"
-              title="Типы документов"
-            ></v-list-item>          
-          </template>
-          <v-list-item prepend-icon="mdi-file-document-multiple" title="Виды кадрового документа" to="/hr-document-types"></v-list-item>
-          <v-list-item prepend-icon="mdi-note-edit-outline" title="Типы служебной записки" to="/memo-types"></v-list-item>
-          <v-list-item prepend-icon="mdi-file-sign" title="Типы договора" to="/contract-types"></v-list-item>
-          <v-list-item prepend-icon="mdi-order-bool-descending-variant" title="Типы ОРД" to="/administrative-document-types"></v-list-item>
-          <v-list-item prepend-icon="mdi-folder-home" title="Типы внутреннего документа" to="/internal-document-types"></v-list-item>
-        </v-list-group>
-
-        <v-list-group value="people">
+        <v-list-group value="administration">
           <template v-slot:activator="{ props }">
             <v-list-item
               v-bind="props"
               prepend-icon="mdi-account-group-outline"
-              title="Люди"
+              title="Администрирование"
             ></v-list-item>
           </template>
           <v-list-item prepend-icon="mdi-account-group" title="Департаменты и пользователи" to="/departments"></v-list-item>
           <v-list-item prepend-icon="mdi-badge-account-outline" title="Должности" to="/positions"></v-list-item>
           <v-list-item prepend-icon="mdi-face-agent" title="Контрагенты" to="/counterparties"></v-list-item>
+          <v-list-item prepend-icon="mdi-file-document-multiple" title="Виды кадрового документа" to="/hr-document-types"></v-list-item>
+          <v-list-item prepend-icon="mdi-note-edit-outline" title="Типы служебной записки" to="/memo-types"></v-list-item>
+          <v-list-item prepend-icon="mdi-file-sign" title="Типы договора" to="/contract-types"></v-list-item>
+          <v-list-item prepend-icon="mdi-order-bool-descending-variant" title="Типы ОРД" to="/administrative-document-types"></v-list-item>
+          <v-list-item prepend-icon="mdi-folder-home" title="Типы внутреннего документа" to="/internal-document-types"></v-list-item>
+          <v-list-item prepend-icon="mdi-truck-fast" title="Способы доставки" to="/delivery-methods"></v-list-item>
         </v-list-group>
         
-          <v-list-item prepend-icon="mdi-truck-fast" title="Способы доставки" to="/delivery-methods"></v-list-item>
           <!--v-list-item prepend-icon="mdi-account" title="Категории" to="/categories"></v-list-item-->
       </v-list>
     </v-navigation-drawer>
