@@ -41,6 +41,7 @@ import ActiveIncomingCorrespondences from '@/components/ActiveIncomingCorrespond
 import ArchivedIncomingCorrespondences from '@/components/ArchivedIncomingCorrespondences.vue'
 import ActiveInternalDocuments from '@/components/ActiveInternalDocuments.vue'
 import ArchivedInternalDocuments from '@/components/ArchivedInternalDocuments.vue'
+import Service from '@/components/Service.vue'
 import HelloWorld from '@/components/HelloWorld.vue';
 
 const routes = [
@@ -78,6 +79,7 @@ const routes = [
   { path: '/archived/incoming-correspondences', component: ArchivedIncomingCorrespondences, meta: { requiresAuth: true } },
   { path: '/active/internal-documents', component: ActiveInternalDocuments, meta: { requiresAuth: true } },
   { path: '/archived/internal-documents', component: ArchivedInternalDocuments, meta: { requiresAuth: true } },
+  { path: '/service', component: Service, meta: { requiresAuth: true } },
   { path: '/login', component: LoginForm }
 ];
 

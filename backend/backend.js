@@ -37,6 +37,7 @@ const { activeIncomingCorrespondenceRouter } = require("./routers/activeIncoming
 const { archivedIncomingCorrespondenceRouter } = require("./routers/archivedIncomingCorrespondenceRouter.js");
 const { activeInternalDocumentRouter } = require("./routers/activeInternalDocumentRouter.js");
 const { archivedInternalDocumentRouter } = require("./routers/archivedInternalDocumentRouter.js");
+const { downloadRouter } = require("./routers/downloadRouter.js");
 
 app.use("/api/positions/", positionRouter);
 app.use("/api/categories/", categoryRouter);
@@ -73,6 +74,7 @@ app.use("/api/active/incoming-correspondences/", activeIncomingCorrespondenceRou
 app.use("/api/archived/incoming-correspondences/", archivedIncomingCorrespondenceRouter);
 app.use("/api/active/internal-documents/", activeInternalDocumentRouter);
 app.use("/api/archived/internal-documents/", archivedInternalDocumentRouter);
+app.use("/api/download/datadump/", downloadRouter);
    
 app.use("/about", function (request, response) {
     response.send("О сайте");

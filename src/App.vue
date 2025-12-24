@@ -41,7 +41,7 @@
             <v-list-item
               v-bind="props"
               prepend-icon="mdi-file-document-multiple-outline"
-              title="Документы"
+              title="Регистрация документов"
             ></v-list-item>       
           </template>
           <v-list-item prepend-icon="mdi-file-document-multiple" title="Кадровые документы" to="/hr-documents"></v-list-item>
@@ -72,7 +72,7 @@
           <v-list-item prepend-icon="mdi-truck-fast" title="Способы доставки" to="/delivery-methods"></v-list-item>
         </v-list-group>
         
-          <!--v-list-item prepend-icon="mdi-account" title="Категории" to="/categories"></v-list-item-->
+        <v-list-item prepend-icon="mdi-account" title="Сервис" to="/service"></v-list-item>
       </v-list>
     </v-navigation-drawer>
 
