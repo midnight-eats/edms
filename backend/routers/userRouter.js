@@ -5,11 +5,13 @@ const { userGet,
   userGetPlain,
   userPostCreate, 
   userPostDelete, 
-  userPostUpdate } = require('../controllers/userController');
+  userPostUpdate,
+  userGetById } = require('../controllers/userController');
 
 const userRouter = express.Router();
 const jwt = require("jsonwebtoken");
 
+/*
 userRouter.use((req, res, next) => {
   console.log("!!!!!!!!!!!!!!!!!");
   const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -26,9 +28,10 @@ userRouter.use((req, res, next) => {
   } catch (err) {
     res.status(401).json({ message: 'Token is not valid' });
   }
-});
+});*/
 
 userRouter.get("/", userGet);
+userRouter.get("/get/:id", userGetById);
 userRouter.get("/plain", userGetPlain);
 userRouter.post("/delete/:id", userPostDelete);
 userRouter.post("/create", userPostCreate);

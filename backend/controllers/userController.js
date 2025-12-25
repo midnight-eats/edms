@@ -86,10 +86,30 @@ async function userPostUpdate(request, response) {
     });
 }
 
+
+async function userGetById(request, response) {
+  var id = request.params["id"];
+
+  console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+
+  User.findOne({ 
+    where: {
+      id: id,
+      is_deleted: false
+    },
+    attributes: ['id', 'username', 'name', 'role']
+  })
+  .then((res) => {
+    response.json(res);
+  })
+  .catch(err => console.log(err));
+}
+
 module.exports = { 
   userGet,
   userGetPlain,
   userPostCreate, 
   userPostDelete, 
-  userPostUpdate 
+  userPostUpdate,
+  userGetById
 }

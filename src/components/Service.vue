@@ -1,5 +1,8 @@
 <template>
-  <v-btn  @click="downloadDataFile">Сачать файл с данными</v-btn>
+  <v-row>
+    <v-btn  @click="downloadDataFileJson">Сачать файл с данными (json)</v-btn>
+    <!--v-btn  @click="downloadDataFileCsv">Сачать файл с данными (csv)</v-btn-->
+  </v-row>
 </template>
 
 <script>
@@ -7,9 +10,9 @@ import axios from 'axios';
 
 export default {
   methods: {
-    async downloadDataFile() {
+    async downloadDataFileJson() {
       try {
-        const response = await axios.get('/api/download/datadump/', {
+        const response = await axios.get('/api/download/datadump/json', {
           responseType: 'blob', // Important: tells axios to handle the response as binary data
           // Include headers if necessary, e.g.,
           // headers: {
@@ -38,6 +41,24 @@ export default {
         link.click(); // Programmatically click the link to trigger download
 
         // Clean up the blob URL
+        URL.revokeObjectURL(link.href);
+      } catch (error) {
+        console.error('Download error:', error);
+      }
+    },
+
+    async downloadDataFileCsv() {
+      try {
+        const response = await axios.get('/api/download/datadump/csv', {
+          responseType: 'blob',
+        });
+        
+        const blob = new Blob([response.data], { type: 'text/csv' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = response.headers['content-disposition']?.split('filename=')[1]?.replace(/"/g, '') || 'data.csv';
+        link.click();
+        
         URL.revokeObjectURL(link.href);
       } catch (error) {
         console.error('Download error:', error);

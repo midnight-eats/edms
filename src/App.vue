@@ -4,7 +4,7 @@
     <v-navigation-drawer width='400' app v-model="drawer">
       <v-list nav dense>
         <!--v-list-item prepend-icon="mdi-home" title="Home" to="/"></v-list-item-->
-        <v-list-group value="activeDocuments">
+        <v-list-group v-if="currentUser.role === 'сотрудник'" value="activeDocuments">
           <template v-slot:activator="{ props }">
             <v-list-item
               v-bind="props"
@@ -20,7 +20,7 @@
           <v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/active/incoming-correspondences"></v-list-item>
           <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/active/internal-documents"></v-list-item>
         </v-list-group>
-        <v-list-group value="archivedDocuments">
+        <v-list-group v-if="currentUser.role === 'сотрудник'" value="archivedDocuments">
           <template v-slot:activator="{ props }">
             <v-list-item
               v-bind="props"
@@ -36,7 +36,8 @@
           <v-list-item prepend-icon="mdi-email-arrow-left" title="Входящие корреспонденции" to="/archived/incoming-correspondences"></v-list-item>
           <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/archived/internal-documents"></v-list-item>
         </v-list-group>
-        <v-list-group value="documents">
+        
+        <v-list-group v-if="currentUser.role === 'оператор'" value="documents">
           <template v-slot:activator="{ props }">
             <v-list-item
               v-bind="props"
@@ -53,7 +54,7 @@
           <v-list-item prepend-icon="mdi-folder-home" title="Внутренние документы" to="/internal-documents"></v-list-item>
         </v-list-group>
 
-        <v-list-group value="administration">
+        <v-list-group v-if="currentUser.role === 'администратор'" value="administration">
           <template v-slot:activator="{ props }">
             <v-list-item
               v-bind="props"
@@ -72,13 +73,24 @@
           <v-list-item prepend-icon="mdi-truck-fast" title="Способы доставки" to="/delivery-methods"></v-list-item>
         </v-list-group>
         
-        <v-list-item prepend-icon="mdi-account" title="Сервис" to="/service"></v-list-item>
+        <v-list-item v-if="currentUser.role === 'администратор'" prepend-icon="mdi-account" title="Сервис" to="/service"></v-list-item>
       </v-list>
     </v-navigation-drawer>
 
     <v-app-bar app v-model="appbar">
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>EDMS</v-toolbar-title>
+
+      <v-spacer></v-spacer>
+      
+      <!-- User info -->
+      <div class="d-flex align-center mr-3">
+        <div class="text-right">
+          <div class="text-body-2 font-weight-medium">{{ currentUser.name }}</div>
+          <div class="text-caption text-grey">{{ currentUser.role }}</div>
+        </div>
+      </div>
+
       <v-btn 
         text="Выйти"
         href="/login"
@@ -97,8 +109,9 @@
 </template>
 
 <script>
-
   import { ref } from 'vue';
+  import { jwtDecode } from 'jwt-decode';
+  import axios from 'axios';
 
 export default 
 {
@@ -111,30 +124,34 @@ export default
     return  {
       drawer: ref(true),
       appbar: ref(true),
-
+      currentUser: {
+        id: 0,
+        name: '',
+        username: '',
+        role: 'оператор'
+      }
     };
   },
-  mounted() 
-  { 
-
+  mounted() { 
     this.emitter.on("loggedin", () => this.showAll());
     this.emitter.on("loggedout", () => this.hideAll());
 
     //this.emitter.on("toggle-sidebar", isOpen => {
     //  this.isOpen = isOpen;
+    this.loadUserData();
     console.log("MOUNTED");
 
   },
-  setup()
-  {
+  setup() {
     //drawer.value = false
     console.log("SETUP");
     //this.drawer.value = false;    
   },
-  methods:
-  {
+  methods: {
     showAll() {
       console.log("LOGINED!!!");
+      this.getUserIdFromToken();
+      console.log(this.currentUser.id);
       this.drawer = true;
       this.appbar = true;
     },
@@ -147,9 +164,51 @@ export default
 
     logOut() {
       localStorage.removeItem('userToken');
+    },
+
+    getUserIdFromToken() {
+      const token = localStorage.getItem('userToken');
+      if (token) {
+        try {
+          const decoded = jwtDecode(token);
+          this.currentUser.id = decoded.id;
+          const id = this.currentUser.id;
+          
+          Promise.all([
+            axios.get(`/api/users/get/${id}`)
+          ])
+          .then((responses) => {
+            this.currentUser = responses[0].data;
+            console.log(responses[0].data);
+          })
+        } catch (error) {
+          console.error("Invalid token:", error);
+        }
+      }
+    },
+
+    async loadUserData() {
+      const token = localStorage.getItem('userToken');
+
+      if (!token) {
+        console.log("No token")
+        return;
+      }
+
+      try {
+        const decoded = jwtDecode(token);
+        const response = await axios.get(`/api/users/get/${decoded.id}`);
+
+        this.currentUser = {
+          id: decoded.id,
+          name: decoded.name,
+          username: decoded.username,
+          role: response.data.role
+        };
+      } catch (err) {
+        console.log(err);
+      }
     }
   }
-
-
 }
 </script>

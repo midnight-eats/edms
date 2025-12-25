@@ -47,7 +47,7 @@ downloadRouter.use((req, res, next) => {
   }
 });
 
-downloadRouter.get("/", async function(req, res) {
+downloadRouter.get("/json", async function(req, res) {
   var result = {};
 
   result.users = await User.findAll();
@@ -72,6 +72,47 @@ downloadRouter.get("/", async function(req, res) {
   result.deliveryMethods = await DeliveryMethod.findAll();
 
   res.json(result);
+});
+
+
+downloadRouter.get("/csv", async function(req, res) {
+  // Set CSV headers
+  res.setHeader('Content-Type', 'text/csv');
+  
+  const now = new Date();
+  const filename = `data-${now.toISOString().slice(0,19).replace(/:/g, '-')}.csv`;
+  res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+  
+  // Create CSV writer
+  const { stringify } = require('csv-stringify');
+  const stringifier = stringify({ header: true });
+  
+  // Pipe CSV data directly to response
+  stringifier.pipe(res);
+  
+  // Fetch and write each table
+  const tables = [
+    //{ name: 'users', data: await User.findAll() },
+    { name: 'departments', data: await Department.findAll() }
+    // ... add all other tables
+  ];
+  
+  for (const table of tables) {
+    if (table.data.length === 0) continue;
+    
+    // Write table name as separator
+    stringifier.write([`=== ${table.name.toUpperCase()} ===`]);
+    
+    // Write data
+    for (const row of table.data) {
+      stringifier.write(Object.values(row));
+    }
+    
+    // Add empty line between tables
+    stringifier.write([]);
+  }
+  
+  stringifier.end();
 });
 
 // Пример - загрузка файла из файловой системы

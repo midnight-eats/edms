@@ -1,21 +1,23 @@
 <template>
-  <v-form ref="form" @submit.prevent="login" max-width="500">
-    <v-text-field
-      v-model="username"
-      label="Username"
-      required
-    ></v-text-field>
-    <v-text-field
-      v-model="password"
-      label="Password"
-      type="password"
-      required
-      md="12"
-      cols="12"
-    ></v-text-field>
-    <v-btn type="submit" color="primary">Login</v-btn>
-    <div v-if="error" class="error-message">{{ error }}</div>
-  </v-form>
+  <v-sheet class="mx-auto pa-6 ma-6 align-baseline" width="800">
+    <v-form ref="form" @submit.prevent="login">
+      <v-text-field
+        v-model="username"
+        label="Логин"
+        required
+      ></v-text-field>
+      <v-text-field
+        v-model="password"
+        label="Пароль"
+        type="password"
+        required
+        md="12"
+        cols="12"
+      ></v-text-field>
+      <v-btn type="submit" color="primary">Войти</v-btn>
+      <div v-if="error" class="error-message">{{ error }}</div>
+    </v-form>
+  </v-sheet>
 </template>
 
 <script>
